@@ -1,6 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import path from 'path'
+import { fileURLToPath } from 'url'
+
+// Fix for __dirname in ES modules
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,22 +15,37 @@ export default defineConfig({
     },
   },
   build: {
-    // Code splitting optimization
+    // Code splitting optimization - simplified for better compatibility
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Split vendor libraries into separate chunks for better caching
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs'],
-          'chart-vendor': ['recharts'],
-          'form-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
-          'animation-vendor': ['framer-motion'],
-          'utils-vendor': ['date-fns', 'clsx', 'tailwind-merge'],
+        manualChunks: (id) => {
+          // Only split large vendor libraries
+          if (id.includes('node_modules')) {
+            // React and related libraries
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'react-vendor'
+            }
+            // Framer Motion (large animation library)
+            if (id.includes('framer-motion')) {
+              return 'animation-vendor'
+            }
+            // Recharts (charting library)
+            if (id.includes('recharts')) {
+              return 'chart-vendor'
+            }
+            // Leaflet (mapping library)
+            if (id.includes('leaflet')) {
+              return 'map-vendor'
+            }
+            // Other node_modules
+            return 'vendor'
+          }
+          // Don't manually chunk app code - let Vite handle it
         },
-        // Optimize chunk file names
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js',
-        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+        // Simplified file naming for better server compatibility
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
     // Increase chunk size warning limit
@@ -39,6 +58,10 @@ export default defineConfig({
     sourcemap: false,
     // Target modern browsers for smaller bundles
     target: 'esnext',
+    // Common JS output format for better compatibility
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
   },
   server: {
     port: 8080,
@@ -46,7 +69,7 @@ export default defineConfig({
     strictPort: false,
     // Enable CORS
     cors: true,
-    // Warm up frequently used files
+    // Warm up frequently used files for faster dev startup
     warmup: {
       clientFiles: [
         './src/main.tsx',
@@ -54,13 +77,20 @@ export default defineConfig({
         './src/pages/Index.tsx',
       ]
     },
-    // Vite dev server natively handles SPA routing — all 404s fall back to index.html
+    // Vite dev server natively handles SPA routing
+    proxy: {
+      // Proxy API requests to backend during development
+      '/api': {
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+      }
+    }
   },
   preview: {
     port: 8080,
     host: true,
     strictPort: false,
-    // SPA fallback: all unknown routes serve index.html so React Router works on refresh
+    // SPA fallback for preview mode
   },
   // Optimize dependency pre-bundling
   optimizeDeps: {
@@ -75,4 +105,6 @@ export default defineConfig({
     // Exclude large dependencies from pre-bundling
     exclude: ['leaflet', 'react-leaflet'],
   },
+  // Base path for deployment (change if deploying to subdirectory)
+  base: '/',
 })
