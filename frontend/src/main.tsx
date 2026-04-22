@@ -4,6 +4,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { initSession } from "./lib/session";
 import { syncPlatformSettings } from "./lib/platformName";
+import { measurePerformance, optimizeImages } from "./lib/performance";
 import "./lib/i18n"; // initialize i18next
 
 // Must run before React renders — clears inherited sessionStorage on fresh tab loads
@@ -11,6 +12,10 @@ initSession();
 
 // Set document.title synchronously from localStorage before first render
 document.title = localStorage.getItem("platformName") || "JoyEvents";
+
+// Initialize performance optimizations
+measurePerformance();
+optimizeImages();
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null };
