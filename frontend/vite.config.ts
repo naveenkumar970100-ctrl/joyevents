@@ -21,8 +21,17 @@ export default defineConfig({
         manualChunks: (id) => {
           // Only split large vendor libraries
           if (id.includes('node_modules')) {
-            // React and related libraries
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+            // Group React and core UI libraries together to avoid initialization issues
+            // This ensures they are in the same chunk and share the same React instance
+            if (
+              id.includes('react') || 
+              id.includes('react-dom') || 
+              id.includes('react-router') || 
+              id.includes('lucide-react') || 
+              id.includes('@radix-ui') ||
+              id.includes('react-i18next') ||
+              id.includes('@tanstack/react-query')
+            ) {
               return 'react-vendor'
             }
             // Framer Motion (large animation library)
