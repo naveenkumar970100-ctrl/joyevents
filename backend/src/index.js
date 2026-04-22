@@ -54,8 +54,58 @@ app.use(express.json());
 // Serve uploaded images as static files
 app.use("/uploads", express.static(resolve(__dirname, "../uploads")));
 
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok", uptime: process.uptime() });
+app.get("/health", async (_req, res) => {
+  try {
+    // Basic health check
+    const health = {
+      status: "ok",
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+      environment: {
+        nodeEnv: process.env.NODE_ENV,
+        port: process.env.PORT,
+        hasMongoUri: !!process.env.MONGO_URI,
+        hasJwtSecret: !!process.env.JWT_SECRET,
+        frontendUrl: process.env.FRONTEND_URL
+      }
+    };
+
+    // Test database connection
+    try {
+      const mongoose = await import("mongoose");
+      if (mongoose.default.connection.readyState === 1) {
+        health.database = "connected";
+        
+        // Test basic database operations
+        const User = (await import("./models/User.js")).default;
+        const userCount = await User.countDocuments();
+        health.userCount = userCount;
+        
+        const Booking = (await import("./models/Booking.js")).default;
+        const bookingCount = await Booking.countDocuments();
+        health.bookingCount = bookingCount;
+        
+        const Event = (await import("./models/Event.js")).default;
+        const eventCount = await Event.countDocuments();
+        health.eventCount = eventCount;
+        
+      } else {
+        health.database = "disconnected";
+        health.dbState = mongoose.default.connection.readyState;
+      }
+    } catch (dbError) {
+      health.database = "error";
+      health.dbError = dbError.message;
+    }
+
+    res.json(health);
+  } catch (error) {
+    res.status(500).json({ 
+      status: "error", 
+      error: error.message,
+      uptime: process.uptime()
+    });
+  }
 });
 
 app.use("/api/auth", authRoutes);
@@ -73,37 +123,36 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/recommendations", recommendationRoutes);
 app.use("/api/translate", translateRoutes);
 
-// Serve frontend build if it exists (production / single-port mode)
-const frontendDist = resolve(__dirname, "../../frontend/dist");
-if (existsSync(frontendDist)) {
-  app.use(express.static(frontendDist));
-  // Catch-all: return index.html for any non-API route so React Router works on refresh
-  app.get("*", (_req, res) => {
-    res.sendFile(resolve(frontendDist, "index.html"));
-  });
+// Serve frontend build only in non-Docker / single-process mode (PM2 / local)
+// In Docker, Nginx serves the frontend and proxies /api → this backend.
+if (process.env.SERVE_FRONTEND === "true") {
+  const frontendDist = resolve(__dirname, "../../frontend/dist");
+  if (existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
+    app.get("*", (_req, res) => {
+      res.sendFile(resolve(frontendDist, "index.html"));
+    });
+    console.log("Serving frontend from:", frontendDist);
+  }
 }
 
 async function start() {
   try {
     await connectDB();
-    
-    const server = app.listen(PORT, () => {
-      console.log(`API server running on http://localhost:${PORT}`);
-      if (existsSync(frontendDist)) {
-        console.log(`Frontend served at http://localhost:${PORT}`);
-      }
+
+    const server = app.listen(PORT, "0.0.0.0", () => {
+      console.log(`API server running on http://0.0.0.0:${PORT}`);
     });
     
     server.on("error", (err) => {
       if (err && err.code === "EADDRINUSE") {
-        console.error(`Port ${PORT} is already in use. Please close the application using this port and try again.`);
+        console.error(`Port ${PORT} is already in use.`);
         process.exit(1);
       } else {
         console.error("Server error:", err);
       }
     });
 
-    // Keep process alive — prevent crash on unhandled errors
     process.on("uncaughtException", (err) => {
       console.error("Uncaught Exception (server kept alive):", err?.message || err);
     });

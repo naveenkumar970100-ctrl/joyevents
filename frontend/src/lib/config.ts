@@ -2,28 +2,32 @@
 //
 // Priority:
 //  1. VITE_API_URL build-time env var  →  use as-is (always wins)
-//  2. Running on localhost             →  use localhost:5001 (local dev)
-//  3. Running on a non-localhost host  →  use same host on port 5001
-//     (PM2 separate deploy: frontend :8080, backend :5001, same server IP)
-//
-// For production with Nginx proxying /api → backend on same domain,
-// set VITE_API_URL to your domain (e.g. https://yourdomain.com) at build time.
+//  2. Running on localhost / 127.0.0.1 →  http://localhost:5001 (local dev)
+//  3. Docker / production (custom domain, no VITE_API_URL set)
+//     → use empty string so all /api calls are relative to the current origin.
+//     Nginx reverse proxy routes /api/* → backend pool, / → frontend.
 
 const envUrl: string = (import.meta as any).env?.VITE_API_URL || "";
 
 function resolveApiUrl(): string {
-  // If an explicit URL was provided at build time, always use it
+  // Explicit override always wins
   if (envUrl) return envUrl;
 
   try {
-    const { protocol, hostname } = window.location;
-    // Local dev: backend on localhost:5001
+    const { hostname } = window.location;
+
+    // Local development — backend runs separately on port 5001
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return "http://localhost:5001";
     }
-    // PM2 separate deploy on same server: frontend on :8080, backend on :5001
-    // Use the same hostname but point to the backend port
-    return `${protocol}//${hostname}:5001`;
+
+    // Docker / production — Nginx sits in front and proxies:
+    //   /api/*     → backend containers
+    //   /health    → backend containers
+    //   /uploads/* → backend containers
+    //   /*         → frontend container
+    // So API calls must be relative (no host/port prefix).
+    return "";
   } catch {
     return "http://localhost:5001";
   }
