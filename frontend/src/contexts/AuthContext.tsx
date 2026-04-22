@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 import { isSessionActive, clearSession } from "@/lib/session";
 
 export type UserRole = "customer" | "merchant" | "admin";
@@ -16,63 +16,94 @@ interface AuthContextType {
   isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  role: "customer",
-  setRole: () => {},
-  isLoggedIn: false,
-  setIsLoggedIn: () => {},
-  token: null,
-  setToken: () => {},
-  user: null,
-  setUser: () => {},
-  updateUser: () => {},
-  isLoading: false,
-});
+// Create context with proper error handling
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setTokenState] = useState<string | null>(
-    () => localStorage.getItem("token")
+    () => {
+      try {
+        return localStorage.getItem("token");
+      } catch {
+        return null;
+      }
+    }
   );
+  
   const [user, setUserState] = useState<any>(() => {
     try {
       const raw = localStorage.getItem("user");
       return raw ? JSON.parse(raw) : null;
-    } catch { return null; }
+    } catch { 
+      return null; 
+    }
   });
+  
   const [role, setRoleState] = useState<UserRole>(() => {
-    const r = localStorage.getItem("role") as UserRole | null;
-    return r === "customer" || r === "merchant" || r === "admin" ? r : "customer";
+    try {
+      const r = localStorage.getItem("role") as UserRole | null;
+      return r === "customer" || r === "merchant" || r === "admin" ? r : "customer";
+    } catch {
+      return "customer";
+    }
   });
-  const [isLoggedIn, setIsLoggedInState] = useState<boolean>(
-    () => !!localStorage.getItem("token") && !!localStorage.getItem("user") && isSessionActive()
-  );
+  
+  const [isLoggedIn, setIsLoggedInState] = useState<boolean>(() => {
+    try {
+      return !!localStorage.getItem("token") && !!localStorage.getItem("user") && isSessionActive();
+    } catch {
+      return false;
+    }
+  });
 
   const setToken = (t: string | null) => {
     setTokenState(t);
-    if (t) localStorage.setItem("token", t);
-    else localStorage.removeItem("token");
+    try {
+      if (t) localStorage.setItem("token", t);
+      else localStorage.removeItem("token");
+    } catch (error) {
+      console.warn('Failed to update token in localStorage:', error);
+    }
   };
 
   const setUser = (u: any) => {
     setUserState(u);
-    if (u) localStorage.setItem("user", JSON.stringify(u));
-    else localStorage.removeItem("user");
+    try {
+      if (u) localStorage.setItem("user", JSON.stringify(u));
+      else localStorage.removeItem("user");
+    } catch (error) {
+      console.warn('Failed to update user in localStorage:', error);
+    }
   };
 
   const setRole = (r: UserRole) => {
     setRoleState(r);
-    localStorage.setItem("role", r);
+    try {
+      localStorage.setItem("role", r);
+    } catch (error) {
+      console.warn('Failed to update role in localStorage:', error);
+    }
   };
 
   const setIsLoggedIn = (v: boolean) => {
     setIsLoggedInState(v);
     if (!v) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("role");
-      clearSession();
+      try {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("role");
+        clearSession();
+      } catch (error) {
+        console.warn('Failed to clear localStorage:', error);
+      }
       setTokenState(null);
       setUserState(null);
       setRoleState("customer");
@@ -84,15 +115,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRole(updatedUser.role);
   };
 
+  const contextValue: AuthContextType = {
+    role, 
+    setRole,
+    isLoggedIn, 
+    setIsLoggedIn,
+    token, 
+    setToken,
+    user, 
+    setUser,
+    updateUser,
+    isLoading: false,
+  };
+
   return (
-    <AuthContext.Provider value={{
-      role, setRole,
-      isLoggedIn, setIsLoggedIn,
-      token, setToken,
-      user, setUser,
-      updateUser,
-      isLoading: false,
-    }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

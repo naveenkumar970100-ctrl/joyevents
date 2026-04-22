@@ -15,43 +15,33 @@ export default defineConfig({
     },
   },
   build: {
-    // Code splitting optimization - simplified for better compatibility
+    // Simplified build configuration to avoid React context issues
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Only split large vendor libraries
-          if (id.includes('node_modules')) {
-            // Group React and core UI libraries together to avoid initialization issues
-            // This ensures they are in the same chunk and share the same React instance
-            if (
-              id.includes('react') || 
-              id.includes('react-dom') || 
-              id.includes('react-router') || 
-              id.includes('lucide-react') || 
-              id.includes('@radix-ui') ||
-              id.includes('react-i18next') ||
-              id.includes('@tanstack/react-query')
-            ) {
-              return 'react-vendor'
-            }
-            // Framer Motion (large animation library)
-            if (id.includes('framer-motion')) {
-              return 'animation-vendor'
-            }
-            // Recharts (charting library)
-            if (id.includes('recharts')) {
-              return 'chart-vendor'
-            }
-            // Leaflet (mapping library)
-            if (id.includes('leaflet')) {
-              return 'map-vendor'
-            }
-            // Other node_modules
-            return 'vendor'
-          }
-          // Don't manually chunk app code - let Vite handle it
+        manualChunks: {
+          // Keep React and React-DOM together to prevent context issues
+          'react-vendor': ['react', 'react-dom'],
+          // Group React ecosystem libraries
+          'react-libs': [
+            'react-router-dom', 
+            '@tanstack/react-query',
+            'react-hook-form',
+            'react-i18next'
+          ],
+          // UI libraries that depend on React context
+          'ui-vendor': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-select',
+            '@radix-ui/react-toast',
+            'lucide-react'
+          ],
+          // Large standalone libraries
+          'animation-vendor': ['framer-motion'],
+          'chart-vendor': ['recharts'],
+          'map-vendor': ['leaflet', 'react-leaflet']
         },
-        // Simplified file naming for better server compatibility
+        // Simplified file naming
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
@@ -59,15 +49,15 @@ export default defineConfig({
     },
     // Increase chunk size warning limit
     chunkSizeWarningLimit: 1000,
-    // Minify with esbuild for faster builds
+    // Use esbuild for minification (faster and no additional dependencies)
     minify: 'esbuild',
     // Enable CSS code splitting
     cssCodeSplit: true,
-    // Disable sourcemaps in production for smaller files
-    sourcemap: false,
-    // Target modern browsers for smaller bundles
-    target: 'esnext',
-    // Common JS output format for better compatibility
+    // Enable sourcemaps for debugging deployment issues
+    sourcemap: true,
+    // Target ES2020 for better browser compatibility
+    target: 'es2020',
+    // Ensure proper module format
     commonjsOptions: {
       include: [/node_modules/],
     },
