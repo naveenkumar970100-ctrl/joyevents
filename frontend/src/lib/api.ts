@@ -1,5 +1,12 @@
 import { API_URL } from "./config";
 
+// Helper: build a URL that works whether API_URL is absolute ("https://example.com")
+// or empty string (Docker/Nginx — relative paths, same origin).
+function buildUrl(path: string): URL {
+  const base = API_URL || window.location.origin;
+  return new URL(path, base);
+}
+
 export async function apiRegister(params: { name: string; email: string; password: string; role: "customer" | "merchant" | "admin" }) {
   const role = params.role === "customer" ? "user" : params.role;
   const res = await fetch(`${API_URL}/api/auth/register`, {
@@ -78,7 +85,7 @@ export async function apiCreateBooking(
 }
 
 export async function apiListBookings(status: string | undefined, token: string) {
-  const url = new URL(`${API_URL}/api/bookings`);
+  const url = buildUrl(`${API_URL}/api/bookings`);
   if (status) url.searchParams.set("status", status);
   const res = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${token}` }
@@ -378,7 +385,7 @@ export async function apiChangePassword(params: { currentPassword: string; newPa
 
 // Notification APIs
 export async function apiGetNotifications(token: string, params?: { limit?: number; status?: string }) {
-  const url = new URL(`${API_URL}/api/notifications`);
+  const url = buildUrl(`${API_URL}/api/notifications`);
   if (params?.limit) url.searchParams.set("limit", params.limit.toString());
   if (params?.status) url.searchParams.set("status", params.status);
 
@@ -657,7 +664,7 @@ export async function apiResetPassword(userId: string, newPassword: string, toke
 // ── Categories ──────────────────────────────────────────────────────────────
 
 export async function apiListCategories(type?: "event" | "service") {
-  const url = new URL(`${API_URL}/api/categories`);
+  const url = buildUrl(`${API_URL}/api/categories`);
   if (type) url.searchParams.set("type", type);
   const res = await fetch(url.toString());
   if (!res.ok) {
@@ -903,7 +910,7 @@ export async function apiGetPendingWithdrawals(token: string) {
 }
 
 export async function apiGetAllWithdrawals(token: string, status?: string) {
-  const url = new URL(`${API_URL}/api/earnings/admin/withdrawals`);
+  const url = buildUrl(`${API_URL}/api/earnings/admin/withdrawals`);
   if (status) {
     url.searchParams.append("status", status);
   }

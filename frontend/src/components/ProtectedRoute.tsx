@@ -33,7 +33,12 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
 
   const isAuthenticated = isLoggedIn && isSessionActive() && token && user && checkAuth();
 
-  if (!isAuthenticated) {
+  // Fallback: if sessionStorage was wiped by a proxy-masked reload but
+  // localStorage still has valid credentials, restore the session silently.
+  const hasValidStorage = checkAuth();
+  const effectivelyAuthenticated = (isAuthenticated) || (hasValidStorage && token && user && isLoggedIn);
+
+  if (!effectivelyAuthenticated) {
     if (sessionStorage.getItem("forceLoginNoRedirect") === "1") {
       sessionStorage.removeItem("forceLoginNoRedirect");
       localStorage.removeItem("authReturnTo");
@@ -41,7 +46,6 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     }
     const returnTo = location.pathname + location.search;
     localStorage.setItem("authReturnTo", returnTo);
-    console.log('🔒 Protected route access denied, redirecting to login:', location.pathname);
     return <Navigate to={`/login?redirect=${encodeURIComponent(returnTo)}`} replace />;
   }
 

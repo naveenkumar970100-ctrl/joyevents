@@ -461,7 +461,7 @@ const AdminOverview = () => {
             <h2 className="font-display text-xs sm:text-2xl font-bold flex items-center gap-2">
               ⭐ Customer Reviews & Ratings
             </h2>
-            <Link to="/admin-dashboard/payment-management">
+            <Link to="/admin-dashboard/payments">
               <Button size="sm" variant="outline">View All</Button>
             </Link>
           </div>
