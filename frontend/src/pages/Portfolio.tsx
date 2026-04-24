@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Award, TrendingUp, Heart, Layers } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import portfolioHero from "@/assets/portfolio-hero.jpg";
+import { STATIC_IMAGES } from "@/lib/staticImages";
 
 const PROJECTS = [
   {
@@ -61,7 +61,7 @@ const Portfolio = () => (
   <Layout>
     {/* ── Hero ─────────────────────────────────────── */}
     <section className="relative isolate overflow-hidden">
-      <img src={portfolioHero} alt="Our Portfolio" className="h-[75vh] w-full object-cover" loading="eager" />
+      <img src={STATIC_IMAGES.portfolioHero} alt="Our Portfolio" className="h-[75vh] w-full object-cover" loading="eager" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
       <div className="absolute inset-0 flex items-center">
         <div className="container mx-auto">

@@ -53,8 +53,8 @@ export default defineConfig({
     minify: 'esbuild',
     // Enable CSS code splitting
     cssCodeSplit: true,
-    // Enable sourcemaps for debugging deployment issues
-    sourcemap: true,
+    // Disable sourcemaps in production for smaller files
+    sourcemap: false,
     // Target ES2020 for better browser compatibility
     target: 'es2020',
     // Ensure proper module format
@@ -100,9 +100,9 @@ export default defineConfig({
       '@tanstack/react-query',
       'framer-motion',
       'lucide-react',
+      'leaflet',
+      'react-leaflet',
     ],
-    // Exclude large dependencies from pre-bundling
-    exclude: ['leaflet', 'react-leaflet'],
   },
   // Base path for deployment (change if deploying to subdirectory)
   base: '/',

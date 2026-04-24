@@ -13,7 +13,7 @@ This guide covers deploying the frontend and backend as **separate PM2 processes
 
 ## Prerequisites
 
-1. **Node.js** v18+ and **npm**
+1. **Node.js** v24+ and **npm** v10+
 2. **PM2** installed globally: `npm install -g pm2`
 3. **MongoDB** connection string
 4. **SMTP** credentials (for emails)

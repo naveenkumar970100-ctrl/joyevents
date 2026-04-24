@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Users, Award, Globe, Heart } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import aboutHero from "@/assets/about-hero.jpg";
+import { STATIC_IMAGES } from "@/lib/staticImages";
 
 const stats = [
   { value: "1,800+", label: "Events Hosted" },
@@ -68,7 +68,7 @@ const AboutUs = () => (
     <section className="relative isolate overflow-hidden">
       {/* Background image — lighter overlay so it's clearly visible */}
       <img
-        src={aboutHero}
+        src={STATIC_IMAGES.aboutHero}
         alt="Elegant event management team coordinating a luxury celebration"
         className="h-[75vh] w-full object-cover"
         loading="eager"

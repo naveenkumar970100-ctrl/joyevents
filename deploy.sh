@@ -16,6 +16,19 @@ set -e  # exit on any error
 echo "🚀 JoyEvents Deploy"
 echo "====================="
 
+# ── 0. Enforce Node.js v24+ ────────────────────────────────────────────────────
+NODE_MAJOR=$(node -e "process.stdout.write(String(process.versions.node.split('.')[0]))")
+if [ "$NODE_MAJOR" -lt 24 ]; then
+  echo ""
+  echo "❌ ERROR: Node.js v24+ is required. You are running v$(node -v)."
+  echo "   Install Node 24 via nvm:"
+  echo "     nvm install 24"
+  echo "     nvm use 24"
+  echo "   Or download from: https://nodejs.org"
+  exit 1
+fi
+echo "✅ Node.js $(node -v) — OK"
+
 # ── 1. Install dependencies ────────────────────────────────────────────────────
 echo ""
 echo "📦 Installing backend dependencies..."

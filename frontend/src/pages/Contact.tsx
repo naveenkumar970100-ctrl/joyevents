@@ -5,7 +5,7 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import contactHero from "@/assets/contact-hero.jpg";
+import { STATIC_IMAGES } from "@/lib/staticImages";
 import { useState } from "react";
 import { toast } from "sonner";
 import { usePlatformName, useSupportEmail } from "@/hooks/usePlatformName";
@@ -41,7 +41,7 @@ const Contact = () => {
     <Layout>
       {/* ── Hero ─────────────────────────────────────── */}
       <section className="relative isolate overflow-hidden">
-        <img src={contactHero} alt="Event planning consultation" className="h-[75vh] w-full object-cover" loading="eager" />
+        <img src={STATIC_IMAGES.contactHero} alt="Event planning consultation" className="h-[75vh] w-full object-cover" loading="eager" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
         <div className="absolute inset-0 flex items-center">
           <div className="container mx-auto">

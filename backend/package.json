@@ -2,6 +2,10 @@
   "name": "joyevents-backend",
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",

@@ -1,8 +1,4 @@
-import eventConference from "@/assets/event-conference.jpg";
-import eventWedding from "@/assets/event-wedding.jpg";
-import eventParty from "@/assets/event-party.jpg";
-import eventFood from "@/assets/event-food.jpg";
-import eventWorkshop from "@/assets/event-workshop.jpg";
+import { STATIC_IMAGES } from "@/lib/staticImages";
 
 export interface Event {
   id: string;
@@ -30,7 +26,7 @@ export const mockEvents: Event[] = [
     location: "Convention Center, San Francisco",
     price: 299,
     category: "Conference",
-    image: eventConference,
+    image: STATIC_IMAGES.eventConference,
     attendees: 847,
     maxAttendees: 1200,
     merchant: "TechEvents Inc.",
@@ -45,7 +41,7 @@ export const mockEvents: Event[] = [
     location: "Botanical Gardens, New York",
     price: 45,
     category: "Wedding",
-    image: eventWedding,
+    image: STATIC_IMAGES.eventWedding,
     attendees: 320,
     maxAttendees: 500,
     merchant: "Dream Weddings Co.",
@@ -60,7 +56,7 @@ export const mockEvents: Event[] = [
     location: "Pier 39, Los Angeles",
     price: 150,
     category: "Party",
-    image: eventParty,
+    image: STATIC_IMAGES.eventParty,
     attendees: 2100,
     maxAttendees: 3000,
     merchant: "NightLife Productions",
@@ -75,7 +71,7 @@ export const mockEvents: Event[] = [
     location: "Central Park, Chicago",
     price: 75,
     category: "Food",
-    image: eventFood,
+    image: STATIC_IMAGES.eventFood,
     attendees: 1500,
     maxAttendees: 2000,
     merchant: "Gourmet Events LLC",
@@ -90,7 +86,7 @@ export const mockEvents: Event[] = [
     location: "WeWork Hub, Austin",
     price: 199,
     category: "Workshop",
-    image: eventWorkshop,
+    image: STATIC_IMAGES.eventWorkshop,
     attendees: 45,
     maxAttendees: 60,
     merchant: "LaunchPad Academy",
@@ -105,7 +101,7 @@ export const mockEvents: Event[] = [
     location: "Skyline Rooftop, Miami",
     price: 85,
     category: "Party",
-    image: eventParty,
+    image: STATIC_IMAGES.eventParty,
     attendees: 380,
     maxAttendees: 500,
     merchant: "NightLife Productions",
