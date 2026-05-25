@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Heart, Trash2, Calendar, Briefcase, Loader2 } from "lucide-react";
@@ -111,7 +112,7 @@ const Favorites = () => {
                         <p className="text-xs text-muted-foreground mt-1">{new Date(item.datetime).toLocaleDateString()}</p>
                       )}
                       <div className="mt-3 flex items-center justify-between">
-                        <span className="text-sm font-semibold text-primary">₹{price}</span>
+                        <span className="text-sm font-semibold text-primary">{formatCurrency(price)}</span>
                         <Link to={href}>
                           <Button size="sm" className="bg-gradient-primary text-primary-foreground hover:opacity-90">View</Button>
                         </Link>

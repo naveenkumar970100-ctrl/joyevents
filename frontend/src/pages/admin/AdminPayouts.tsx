@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Wallet, DollarSign, TrendingUp, Users, CreditCard, CheckCircle, Clock, ArrowRight, XCircle, Loader2, AlertCircle } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
@@ -194,7 +195,7 @@ const AdminPayouts = () => {
   };
 
   const handleApproveWithdrawal = async (withdrawal: WithdrawalRequest) => {
-    if (!confirm(`Are you sure you want to approve this withdrawal request of ₹${withdrawal.amount} for ${withdrawal.merchant.name}?`)) {
+    if (!confirm(`Are you sure you want to approve this withdrawal request of ${formatCurrency(withdrawal.amount)} for ${withdrawal.merchant.name}?`)) {
       return;
     }
 
@@ -258,7 +259,7 @@ const AdminPayouts = () => {
         token!
       );
       
-      toast.success(`₹${payout.netPayout.toLocaleString()} credited to ${selectedMerchant.name} successfully!`);
+      toast.success(`${formatCurrency(payout.netPayout)} credited to ${selectedMerchant.name} successfully!`);
       setPayoutDialogOpen(false);
       setPayoutNote("");
       loadData();
@@ -307,7 +308,7 @@ const AdminPayouts = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Total Payout Amount</p>
-                    <p className="font-display text-xs sm:text-2xl font-bold truncate">₹{totalPayoutAmount.toLocaleString()}</p>
+                    <p className="font-display text-xs sm:text-2xl font-bold truncate">{formatCurrency(totalPayoutAmount)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -321,7 +322,7 @@ const AdminPayouts = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Platform Commission</p>
-                    <p className="font-display text-xs sm:text-2xl font-bold truncate">₹{totalCommission.toLocaleString()}</p>
+                    <p className="font-display text-xs sm:text-2xl font-bold truncate">{formatCurrency(totalCommission)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -413,7 +414,7 @@ const AdminPayouts = () => {
                           {withdrawal.merchant.email}
                         </TableCell>
                         <TableCell className="font-semibold text-purple-600">
-                          ₹{withdrawal.amount.toLocaleString()}
+                          {formatCurrency(withdrawal.amount)}
                         </TableCell>
                         <TableCell>
                           <div className="text-xs space-y-1">
@@ -532,13 +533,13 @@ const AdminPayouts = () => {
                           <Badge variant="outline">{payout.completedBookings}</Badge>
                         </TableCell>
                         <TableCell className="font-semibold">
-                          ₹{payout.totalEarnings.toLocaleString()}
+                          {formatCurrency(payout.totalEarnings)}
                         </TableCell>
                         <TableCell className="text-green-600 font-semibold">
-                          ₹{payout.commission.toLocaleString()}
+                          {formatCurrency(payout.commission)}
                         </TableCell>
                         <TableCell className="text-purple-600 font-bold">
-                          ₹{payout.netPayout.toLocaleString()}
+                          {formatCurrency(payout.netPayout)}
                         </TableCell>
                         <TableCell>
                           <Badge className={payout.pendingPayout ? "bg-yellow-500/15 text-yellow-400" : "bg-green-500/15 text-green-400"}>
@@ -606,20 +607,20 @@ const AdminPayouts = () => {
               <div className="flex justify-between items-center mb-2">
                 <Label>Gross Earnings</Label>
                 <p className="text-sm font-semibold">
-                  ₹{selectedMerchant ? merchantPayouts.find(p => p.merchant._id === selectedMerchant._id)?.totalEarnings.toLocaleString() : "0"}
+                  {formatCurrency(selectedMerchant ? merchantPayouts.find(p => p.merchant._id === selectedMerchant._id)?.totalEarnings : 0)}
                 </p>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <Label>Platform Commission (5%)</Label>
                 <p className="text-sm font-semibold text-green-600">
-                  -₹{selectedMerchant ? merchantPayouts.find(p => p.merchant._id === selectedMerchant._id)?.commission.toLocaleString() : "0"}
+                  -{formatCurrency(selectedMerchant ? merchantPayouts.find(p => p.merchant._id === selectedMerchant._id)?.commission : 0)}
                 </p>
               </div>
               <div className="border-t pt-2 mt-2">
                 <div className="flex justify-between items-center">
                   <Label className="text-base">Net Payout Amount</Label>
                   <p className="text-lg font-bold text-purple-600">
-                    ₹{selectedMerchant ? merchantPayouts.find(p => p.merchant._id === selectedMerchant._id)?.netPayout.toLocaleString() : "0"}
+                    {formatCurrency(selectedMerchant ? merchantPayouts.find(p => p.merchant._id === selectedMerchant._id)?.netPayout : 0)}
                   </p>
                 </div>
               </div>
@@ -703,7 +704,7 @@ const AdminPayouts = () => {
                 <div className="flex justify-between items-center">
                   <Label className="text-base">Withdrawal Amount</Label>
                   <p className="text-lg font-bold text-red-600">
-                    ₹{selectedWithdrawal?.amount.toLocaleString()}
+                    {formatCurrency(selectedWithdrawal?.amount)}
                   </p>
                 </div>
               </div>

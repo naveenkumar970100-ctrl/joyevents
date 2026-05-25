@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowRight, X, Loader2, Briefcase, CheckCircle2, Star, Users, Zap, Search, Filter, Image as ImageIcon, ChevronLeft, ChevronRight, MapPin, Navigation, Tag, Heart, Ticket, Copy, Mail } from "lucide-react";
 import Layout from "@/components/Layout";
@@ -223,7 +224,7 @@ const Services = () => {
       setPromoError("");
       const data = await apiValidatePromoCode(code.toUpperCase(), selectedService?.price || 0, undefined, selectedService?._id, token || undefined);
       setAppliedPromo(data.promo);
-      toast.success(`Promo applied! You save ₹${data.discount}`);
+      toast.success(`Promo applied! You save ${formatCurrency(data.discount)}`);
     } catch (error: any) {
       setPromoError(error?.message || "Failed to validate promo code");
       setAppliedPromo(null);
@@ -249,7 +250,7 @@ const Services = () => {
       setPromoError("");
       const data = await apiValidatePromoCode(promoCode.toUpperCase(), selectedService?.price || 0, undefined, selectedService?._id, token || undefined);
       setAppliedPromo(data.promo);
-      toast.success(`Promo applied! You save ₹${data.discount}`);
+      toast.success(`Promo applied! You save ${formatCurrency(data.discount)}`);
     } catch (error: any) {
       setPromoError(error?.message || "Failed to validate promo code");
       setAppliedPromo(null);
@@ -496,7 +497,7 @@ const Services = () => {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <span className="absolute bottom-3 left-3 rounded-full bg-gradient-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                      From ₹{svc.price}
+                      From {formatCurrency(svc.price)}
                     </span>
                   </div>
                   <div className="p-2 sm:p-5 flex flex-col flex-1">
@@ -593,7 +594,7 @@ const Services = () => {
                   </div>
                   <div className="flex items-center justify-between pt-3 border-t border-border">
                     <span className="font-semibold text-primary">
-                      {promo.discountType === "percentage" ? `${promo.discountValue}% OFF` : `₹${promo.discountValue} OFF`}
+                      {promo.discountType === "percentage" ? `${promo.discountValue}% OFF` : `${formatCurrency(promo.discountValue)} OFF`}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       {promo.maxUses ? `${promo.currentUses}/${promo.maxUses} used` : "Unlimited"}
@@ -703,7 +704,7 @@ const Services = () => {
               <X className="h-5 w-5" />
             </button>
             <h3 className="font-display text-xl font-bold">Book — {selectedService.name}</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Starting price: <span className="font-semibold text-foreground">₹{selectedService.price}</span></p>
+            <p className="mt-1 text-sm text-muted-foreground">Starting price: <span className="font-semibold text-foreground">{formatCurrency(selectedService.price)}</span></p>
 
             <div className="mt-5 grid gap-4">
               {/* Date & Time */}
@@ -747,14 +748,14 @@ const Services = () => {
                           />
                           <span className="text-sm font-medium text-foreground">{addon.name}</span>
                         </div>
-                        <span className="text-sm font-semibold text-primary">+₹{addon.price}</span>
+                        <span className="text-sm font-semibold text-primary">+{formatCurrency(addon.price)}</span>
                       </label>
                     ))}
                   </div>
                   {selectedAddOns.length > 0 && (
                     <p className="mt-2 text-xs text-muted-foreground">
                       Add-ons total: <span className="font-semibold text-foreground">
-                        +₹{(selectedService.addOns || []).filter((a: any) => selectedAddOns.includes(a.name)).reduce((s: number, a: any) => s + Number(a.price), 0)}
+                        +{formatCurrency((selectedService.addOns || []).filter((a: any) => selectedAddOns.includes(a.name)).reduce((s: number, a: any) => s + Number(a.price), 0))}
                       </span>
                     </p>
                   )}
@@ -883,7 +884,7 @@ const Services = () => {
                       </button>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      You save: ₹{((selectedService.price + (selectedService.addOns || []).filter((a: any) => selectedAddOns.includes(a.name)).reduce((s: number, a: any) => s + Number(a.price), 0)) - getFinalPrice()).toFixed(0)} — Total: <span className="font-semibold text-foreground">₹{getFinalPrice().toFixed(0)}</span>
+                      You save: {formatCurrency((selectedService.price + (selectedService.addOns || []).filter((a: any) => selectedAddOns.includes(a.name)).reduce((s: number, a: any) => s + Number(a.price), 0)) - getFinalPrice(), { minimumFractionDigits: 0, maximumFractionDigits: 0 })} — Total: <span className="font-semibold text-foreground">{formatCurrency(getFinalPrice(), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                     </p>
                   </div>
                 ) : (
@@ -909,7 +910,7 @@ const Services = () => {
                   disabled={!date || !time || !customerLocation || !customerAddress}
                   onClick={proceedToPayment}
                 >
-                  Proceed to Payment — ₹{getFinalPrice().toFixed(0)}
+                  Proceed to Payment — {formatCurrency(getFinalPrice(), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </Button>
                 <Button variant="outline" className="flex-1" onClick={() => setShowServiceModal(false)}>Cancel</Button>
               </div>
@@ -1047,7 +1048,7 @@ const Services = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                 <span className="absolute bottom-4 left-4 rounded-full bg-gradient-primary px-4 py-2 text-sm font-bold text-primary-foreground shadow-lg">
-                  From ₹{showDetailsModal.price}
+                  From {formatCurrency(showDetailsModal.price)}
                 </span>
               </div>
             )}
@@ -1064,7 +1065,7 @@ const Services = () => {
                     {showDetailsModal.category}
                   </span>
                 )}
-                <span className="text-2xl font-bold text-primary">₹{showDetailsModal.price}</span>
+                <span className="text-2xl font-bold text-primary">{formatCurrency(showDetailsModal.price)}</span>
               </div>
 
               {/* Description */}

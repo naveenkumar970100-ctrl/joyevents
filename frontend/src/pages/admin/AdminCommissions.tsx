@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Calculator, DollarSign, TrendingUp, Percent, Wallet, ArrowRight } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
@@ -125,7 +126,7 @@ const AdminCommissions = () => {
                       step="0.1"
                     />
                     <span className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                      Example: ₹1000 ticket | {customCommissionRate}% commission | Merchant gets ₹{calculateMerchantPayout(1000).toFixed(2)}
+                      Example: {formatCurrency(1000)} ticket | {customCommissionRate}% commission | Merchant gets {formatCurrency(calculateMerchantPayout(1000), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
@@ -147,7 +148,7 @@ const AdminCommissions = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Total Revenue</p>
-                    <p className="font-display text-xs sm:text-2xl font-bold truncate">₹{totalRevenue.toLocaleString()}</p>
+                    <p className="font-display text-xs sm:text-2xl font-bold truncate">{formatCurrency(totalRevenue)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -161,7 +162,7 @@ const AdminCommissions = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Platform Commission</p>
-                    <p className="font-display text-xs sm:text-2xl font-bold truncate">₹{totalCommission.toLocaleString()}</p>
+                    <p className="font-display text-xs sm:text-2xl font-bold truncate">{formatCurrency(totalCommission)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -175,7 +176,7 @@ const AdminCommissions = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Merchant Payouts</p>
-                    <p className="font-display text-xs sm:text-2xl font-bold truncate">₹{totalMerchantPayout.toLocaleString()}</p>
+                    <p className="font-display text-xs sm:text-2xl font-bold truncate">{formatCurrency(totalMerchantPayout)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -254,13 +255,13 @@ const AdminCommissions = () => {
                             </div>
                           </TableCell>
                           <TableCell className="font-semibold">
-                            ₹{booking.price?.toLocaleString()}
+                            {formatCurrency(booking.price)}
                           </TableCell>
                           <TableCell className="text-green-600 font-semibold">
-                            ₹{commission.toFixed(2)}
+                            {formatCurrency(commission, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </TableCell>
                           <TableCell className="text-purple-600 font-semibold">
-                            ₹{merchantPayout.toFixed(2)}
+                            {formatCurrency(merchantPayout, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </TableCell>
                           <TableCell className="text-muted-foreground">
                             {new Date(booking.datetime).toLocaleDateString()}

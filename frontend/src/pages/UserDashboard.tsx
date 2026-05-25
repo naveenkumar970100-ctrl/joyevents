@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { Calendar, DollarSign, Ticket, Clock, CheckCircle2, AlertCircle, Loader2, BarChart3, Video, Search, MapPin, CalendarDays, Briefcase, ArrowRight, Star, FileText, CreditCard } from "lucide-react";
 import CustomerLayout from "@/components/CustomerLayout";
 import StatCard from "@/components/StatCard";
@@ -136,14 +137,14 @@ const UserDashboard = () => {
   <div class="info-item"><label>Booking ID</label><span style="font-family:monospace;font-size:11px;">${b._id?.slice(-10).toUpperCase()}</span></div>
 </div>
 <div class="totals">
-  <div class="totals-row"><span>${serviceName}</span><span>₹${(total + discount).toFixed(2)}</span></div>
-  ${discount > 0 ? `<div class="totals-row discount"><span>Discount${b.promoCode?.code ? ` (${b.promoCode.code})` : ""}</span><span>−₹${discount.toFixed(2)}</span></div>` : ""}
-  <div class="totals-row total"><span>Total Paid</span><span>₹${total.toFixed(2)}</span></div>
+  <div class="totals-row"><span>${serviceName}</span><span>${formatCurrency((total + discount), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+  ${discount > 0 ? `<div class="totals-row discount"><span>Discount${b.promoCode?.code ? ` (${b.promoCode.code})` : ""}</span><span>−${formatCurrency(discount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>` : ""}
+  <div class="totals-row total"><span>Total Paid</span><span>${formatCurrency(total, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
 </div>
 <div class="payment-box">
   <div><div class="label">Reference</div><div class="value">${b.paymentId || "—"}</div></div>
   <div><div class="label">Status</div><div class="value" style="color:#10b981;">✓ Paid</div></div>
-  <div><div class="label">Amount</div><div class="value" style="color:#7c3aed;font-size:16px;font-weight:800;">₹${total.toFixed(2)}</div></div>
+  <div><div class="label">Amount</div><div class="value" style="color:#7c3aed;font-size:16px;font-weight:800;">${formatCurrency(total, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
 </div>
 ${rating ? `<div class="rating-box">⭐ Your Rating: ${rating}</div>` : ""}
 </div>
@@ -442,7 +443,7 @@ ${rating ? `<div class="rating-box">⭐ Your Rating: ${rating}</div>` : ""}
                               )}
                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                               <span className="absolute bottom-3 left-3 rounded-full bg-gradient-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                                From ₹{service.price}
+                                From {formatCurrency(service.price)}
                               </span>
                             </div>
                             <div className="p-2 sm:p-5 flex flex-col flex-1">
@@ -584,7 +585,7 @@ ${rating ? `<div class="rating-box">⭐ Your Rating: ${rating}</div>` : ""}
                         <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(b.datetime).toLocaleDateString()}</p>
                       </div>
                       <div className="flex flex-col items-end gap-1 shrink-0">
-                        <span className="text-xs font-bold">₹{b.price}</span>
+                        <span className="text-xs font-bold">{formatCurrency(b.price)}</span>
                         <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold capitalize ${STATUS_BADGE[b.status] || "bg-secondary text-muted-foreground"}`}>
                           {b.status}
                         </span>
@@ -613,7 +614,7 @@ ${rating ? `<div class="rating-box">⭐ Your Rating: ${rating}</div>` : ""}
                           <div className="truncate">{b.event?.title || b.serviceName}</div>
                           {b.event && <span className="block text-xs text-primary mt-0.5">🎫 {t("event_label")}</span>}
                         </td>
-                        <td className="px-3 py-3 font-semibold whitespace-nowrap">₹{b.price}</td>
+                        <td className="px-3 py-3 font-semibold whitespace-nowrap">{formatCurrency(b.price)}</td>
                         <td className="px-3 py-3 text-muted-foreground whitespace-nowrap">
                           <div className="text-xs">{new Date(b.datetime).toLocaleDateString()}</div>
                           <div className="text-xs">{new Date(b.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
@@ -766,7 +767,7 @@ ${rating ? `<div class="rating-box">⭐ Your Rating: ${rating}</div>` : ""}
       </div>` : ''}
       <div class="detail-row">
         <span class="detail-label">💰 Price Paid</span>
-        <span class="detail-value">₹${b.price}</span>
+        <span class="detail-value">${formatCurrency(b.price)}</span>
       </div>
       ${b.assignedTo?.name ? `
       <div class="detail-row">
@@ -843,7 +844,7 @@ ${rating ? `<div class="rating-box">⭐ Your Rating: ${rating}</div>` : ""}
                             {(b.status === "awaiting_payment" || b.status === "awaiting_final_payment") && !b.event && (
                               <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white font-bold gap-1" onClick={() => openPaymentModal(b)}>
                                 <CreditCard className="h-3.5 w-3.5" />
-                                {b.status === "awaiting_final_payment" ? `Pay ₹${b.remainingAmount}` : b.paymentType === "advance" ? `Pay ₹${b.advanceAmount}` : "Pay Now"}
+                                {b.status === "awaiting_final_payment" ? `Pay ${formatCurrency(b.remainingAmount)}` : b.paymentType === "advance" ? `Pay ${formatCurrency(b.advanceAmount)}` : "Pay Now"}
                               </Button>
                             )}
                           </div>
@@ -862,7 +863,7 @@ ${rating ? `<div class="rating-box">⭐ Your Rating: ${rating}</div>` : ""}
             <StatCard title={t("total_bookings")} value={loading ? "…" : bookings.length} icon={<Ticket className="h-5 w-5" />} index={0} />
             <StatCard title={t("upcoming")} value={loading ? "…" : upcomingBookings.length} icon={<Calendar className="h-5 w-5" />} index={1} />
             <StatCard title={t("completed")} value={loading ? "…" : completedBookings.length} icon={<CheckCircle2 className="h-5 w-5" />} index={2} />
-            <StatCard title={t("total_spent")} value={loading ? "…" : `₹${totalSpent.toLocaleString()}`} icon={<DollarSign className="h-5 w-5" />} index={3} />
+            <StatCard title={t("total_spent")} value={loading ? "…" : `${formatCurrency(totalSpent)}`} icon={<DollarSign className="h-5 w-5" />} index={3} />
           </div>
 
           {/* Live Events Section */}
@@ -974,7 +975,7 @@ ${rating ? `<div class="rating-box">⭐ Your Rating: ${rating}</div>` : ""}
                             <span className="block text-xs text-primary mt-1">🎫 {t("event_label")}</span>
                           )}
                         </td>
-                        <td className="px-4 py-3">₹{b.price}</td>
+                        <td className="px-4 py-3">{formatCurrency(b.price)}</td>
                         <td className="px-4 py-3 text-muted-foreground">
                           <div>
                             <div>{new Date(b.datetime).toLocaleDateString()}</div>
@@ -1140,7 +1141,7 @@ ${rating ? `<div class="rating-box">⭐ Your Rating: ${rating}</div>` : ""}
       </div>` : ''}
       <div class="detail-row">
         <span class="detail-label">💰 Price Paid</span>
-        <span class="detail-value">₹${b.price}</span>
+        <span class="detail-value">${formatCurrency(b.price)}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">👤 Merchant</span>
@@ -1273,7 +1274,7 @@ ${rating ? `<div class="rating-box">⭐ Your Rating: ${rating}</div>` : ""}
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <span className="absolute bottom-3 left-3 rounded-full bg-gradient-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                        From ₹{svc.price}
+                        From {formatCurrency(svc.price)}
                       </span>
                     </div>
                     <div className="p-2 sm:p-5 flex flex-col flex-1">

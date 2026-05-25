@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -157,7 +158,7 @@ const CustomerEventDetail = () => {
       setAppliedPromo(null);
       const data = await apiValidatePromoCode(code.toUpperCase(), getTicketPrice(), event?._id, undefined, token || undefined);
       setAppliedPromo(data.promo);
-      toast.success(`Promo applied! You save ₹${data.discount}`);
+      toast.success(`Promo applied! You save ${formatCurrency(data.discount)}`);
     } catch (error: any) {
       setPromoError(error?.message || "Failed to apply promo code");
       setAppliedPromo(null);
@@ -328,7 +329,7 @@ const CustomerEventDetail = () => {
                               {rem <= 0 && <span className="ml-2 text-xs text-red-500 font-semibold">SOLD OUT</span>}
                               {rem > 0 && <span className="ml-2 text-xs text-green-500">{rem} left</span>}
                             </div>
-                            <span className="text-sm font-semibold text-primary">₹{t.price}</span>
+                            <span className="text-sm font-semibold text-primary">{formatCurrency(t.price)}</span>
                           </div>
                         );
                       })}
@@ -408,7 +409,7 @@ const CustomerEventDetail = () => {
                     {event.price > 0 && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">Price</span>
-                        <span className="font-bold text-primary">₹{event.price}</span>
+                        <span className="font-bold text-primary">{formatCurrency(event.price)}</span>
                       </div>
                     )}
                     {event.datetime && (
@@ -507,7 +508,7 @@ const CustomerEventDetail = () => {
                                   <div>
                                     <span className={`text-sm capitalize ${s.label}`}>{t.type}</span>
                                     <div className="flex items-center gap-2 mt-0.5">
-                                      <span className={`text-sm font-bold ${s.price}`}>₹{t.price}</span>
+                                      <span className={`text-sm font-bold ${s.price}`}>{formatCurrency(t.price)}</span>
                                       {remaining <= 0
                                         ? <span className="text-xs text-red-400 font-semibold">Sold Out</span>
                                         : <span className={`text-xs px-1.5 py-0.5 rounded-full border ${s.badge}`}>{remaining} left</span>}
@@ -530,7 +531,7 @@ const CustomerEventDetail = () => {
                           <button onClick={() => setFullServiceQty(q => Math.max(1, q - 1))} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">−</button>
                           <span className="w-10 text-center font-semibold text-lg">{fullServiceQty}</span>
                           <button onClick={() => setFullServiceQty(q => q + 1)} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">+</button>
-                          <span className="text-xs text-muted-foreground ml-1">× ₹{event.price} each</span>
+                          <span className="text-xs text-muted-foreground ml-1">× {formatCurrency(event.price)} each</span>
                         </div>
                       )}
                     </div>
@@ -581,25 +582,25 @@ const CustomerEventDetail = () => {
                         return (
                           <div key={type} className="flex justify-between text-sm text-muted-foreground mb-2">
                             <span className="capitalize">{type} × {qty}</span>
-                            <span>₹{(t?.price || 0) * qty}</span>
+                            <span>{formatCurrency((t?.price || 0) * qty)}</span>
                           </div>
                         );
                       })}
                       {event.eventType === "fullService" && (
                         <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                          <span>{fullServiceQty} × ₹{event.price}</span>
-                          <span>₹{event.price * fullServiceQty}</span>
+                          <span>{fullServiceQty} × {formatCurrency(event.price)}</span>
+                          <span>{formatCurrency(event.price * fullServiceQty)}</span>
                         </div>
                       )}
                       {appliedPromo && (
                         <div className="flex justify-between text-sm text-green-600 mb-2">
                           <span>Discount</span>
-                          <span>-₹{(getTicketPrice() - getFinalPrice()).toFixed(0)}</span>
+                          <span>-{formatCurrency(getTicketPrice() - getFinalPrice(), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                         </div>
                       )}
                       <div className="border-t border-primary/20 mt-3 pt-3 flex items-center justify-between">
                         <span className="font-semibold">Total</span>
-                        <span className="font-display text-2xl font-bold text-gradient">₹{getFinalPrice().toFixed(0)}</span>
+                        <span className="font-display text-2xl font-bold text-gradient">{formatCurrency(getFinalPrice(), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                       </div>
                     </div>
                   </div>
@@ -617,7 +618,7 @@ const CustomerEventDetail = () => {
                     {(event.eventType === "ticketed" && Object.values(selectedTickets).reduce((s: number, q: any) => s + q, 0) === 0) ||
                      (event.eventType === "fullService" && fullServiceQty === 0)
                       ? "Select Tickets to Continue"
-                      : `Confirm Booking — ₹${getFinalPrice().toFixed(0)}`}
+                      : `Confirm Booking — ${formatCurrency(getFinalPrice(), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
                   </Button>
                 </div>
               )}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Search, CheckCircle2, XCircle, AlertCircle, Loader2, QrCode, AlertTriangle } from "lucide-react";
 import MerchantLayout from "@/components/MerchantLayout";
@@ -258,7 +259,7 @@ const TicketValidation = () => {
                                 </div>
                                 <div>
                                   <p className="text-xs text-muted-foreground">Price Paid</p>
-                                  <p className="font-semibold text-foreground">₹{validationResult.booking.price}</p>
+                                  <p className="font-semibold text-foreground">{formatCurrency(validationResult.booking.price)}</p>
                                 </div>
                               </div>
 

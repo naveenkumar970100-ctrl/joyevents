@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, Users, Ticket, DollarSign, Calendar, Loader2, AlertCircle, RefreshCcw } from "lucide-react";
 import MerchantLayout from "@/components/MerchantLayout";
@@ -139,7 +140,7 @@ const EventAnalytics = () => {
           />
           <StatCard
             title="Total Event Revenue"
-            value={`₹${(analytics?.totalEventRevenue || 0).toLocaleString()}`}
+            value={`${formatCurrency((analytics?.totalEventRevenue || 0))}`}
             icon={DollarSign}
             color="text-green-600"
             trend="+8.2%"
@@ -206,7 +207,7 @@ const EventAnalytics = () => {
                             </div>
                           </td>
                           <td className="py-3 px-4">
-                            <span className="font-semibold text-green-600">₹{event.revenue.toLocaleString()}</span>
+                            <span className="font-semibold text-green-600">{formatCurrency(event.revenue)}</span>
                           </td>
                           <td className="py-3 px-4">
                             <span className={`text-xs px-2 py-1 rounded font-semibold ${

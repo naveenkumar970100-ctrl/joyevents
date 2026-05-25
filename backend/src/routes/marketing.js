@@ -3,6 +3,7 @@ import PromoCode from "../models/PromoCode.js";
 import User from "../models/User.js";
 import Notification from "../models/Notification.js";
 import { verifyToken } from "../middleware/auth.js";
+import { formatCurrency } from "../utils/formatCurrency.js";
 
 const router = Router();
 
@@ -136,7 +137,7 @@ router.post("/validate-promo", async (req, res) => {
     // Check minimum booking amount
     if (promo.minBookingAmount && amount < promo.minBookingAmount) {
       return res.status(400).json({ 
-        error: `Minimum booking amount of ₹${promo.minBookingAmount} required` 
+        error: `Minimum booking amount of ${formatCurrency(promo.minBookingAmount)} required` 
       });
     }
 

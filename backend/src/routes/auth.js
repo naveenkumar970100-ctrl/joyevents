@@ -5,23 +5,36 @@ import crypto from "crypto";
 import User from "../models/User.js";
 import { verifyToken, requireRole } from "../middleware/auth.js";
 import { sendMerchantCredentials, sendPasswordResetEmail } from "../utils/sendEmail.js";
+import {
+  validateEmail,
+  validatePassword,
+  normalizeEmail,
+  validateLoginForm,
+  validateSignupForm,
+  validateNewPasswordForm,
+} from "../utils/validation.js";
 
 const router = Router();
+
+const badRequest = (res, message) => res.status(400).json({ error: message });
 
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password, role } = req.body || {};
     if (!name || !email || !password) {
-      return res.status(400).json({ error: "name, email, and password are required" });
+      return badRequest(res, "name, email, and password are required");
     }
+    const signupErr = validateSignupForm(email, password, { name });
+    if (signupErr) return badRequest(res, signupErr);
+    const normalizedEmail = normalizeEmail(email);
     // Only allow standard users to register publicly
     const userRole = "user";
-    const existing = await User.findOne({ email });
+    const existing = await User.findOne({ email: normalizedEmail });
     if (existing) {
       return res.status(409).json({ error: "Email already registered" });
     }
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, passwordHash, role: userRole });
+    const user = await User.create({ name, email: normalizedEmail, passwordHash, role: userRole });
     const safeUser = { 
       _id: user._id,
       id: user._id, 
@@ -46,9 +59,12 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body || {};
     if (!email || !password) {
-      return res.status(400).json({ error: "email and password are required" });
+      return badRequest(res, "email and password are required");
     }
-    const user = await User.findOne({ email });
+    const loginErr = validateLoginForm(email, password);
+    if (loginErr) return badRequest(res, loginErr);
+    const normalizedEmail = normalizeEmail(email);
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
@@ -106,15 +122,18 @@ router.post("/users", verifyToken, requireRole("admin"), async (req, res) => {
   try {
     const { name, email, password, role } = req.body || {};
     if (!name || !email || !password) {
-      return res.status(400).json({ error: "name, email, and password are required" });
+      return badRequest(res, "name, email, and password are required");
     }
-    const existing = await User.findOne({ email });
+    const signupErr = validateSignupForm(email, password, { name });
+    if (signupErr) return badRequest(res, signupErr);
+    const normalizedEmail = normalizeEmail(email);
+    const existing = await User.findOne({ email: normalizedEmail });
     if (existing) {
       return res.status(409).json({ error: "Email already registered" });
     }
     const passwordHash = await bcrypt.hash(password, 10);
     const assignedRole = ["user", "merchant", "admin"].includes(role) ? role : "user";
-    const user = await User.create({ name, email, passwordHash, role: assignedRole });
+    const user = await User.create({ name, email: normalizedEmail, passwordHash, role: assignedRole });
     const safeUser = { 
       _id: user._id,
       id: user._id, 
@@ -162,7 +181,11 @@ router.patch("/users/:id", verifyToken, requireRole("admin"), async (req, res) =
     const { name, email, role, status } = req.body || {};
     const updates = {};
     if (name) updates.name = name;
-    if (email) updates.email = email;
+    if (email) {
+      const emailErr = validateEmail(email);
+      if (emailErr) return badRequest(res, emailErr);
+      updates.email = normalizeEmail(email);
+    }
     if (role) updates.role = role;
     if (status) updates.status = status;
 
@@ -229,12 +252,10 @@ router.post("/change-password", verifyToken, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ error: "Current password and new password are required" });
+      return badRequest(res, "Current password and new password are required");
     }
-    
-    if (newPassword.length < 6) {
-      return res.status(400).json({ error: "New password must be at least 6 characters long" });
-    }
+    const pwdErr = validateNewPasswordForm(newPassword);
+    if (pwdErr) return badRequest(res, pwdErr);
     
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -263,12 +284,10 @@ router.patch("/admin/reset-password/:userId", verifyToken, requireRole("admin"),
     const userId = req.params.userId;
     
     if (!newPassword) {
-      return res.status(400).json({ error: "New password is required" });
+      return badRequest(res, "New password is required");
     }
-    
-    if (newPassword.length < 6) {
-      return res.status(400).json({ error: "Password must be at least 6 characters long" });
-    }
+    const pwdErr = validateNewPasswordForm(newPassword);
+    if (pwdErr) return badRequest(res, pwdErr);
     
     const user = await User.findById(userId);
     if (!user) {
@@ -306,26 +325,56 @@ router.get("/profile-test", (req, res) => {
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email, redirect } = req.body || {};
-    if (!email) return res.status(400).json({ error: "Email is required" });
+    if (!email) return badRequest(res, "Email is required");
+    const emailErr = validateEmail(email);
+    if (emailErr) return badRequest(res, emailErr);
+    const normalizedEmail = normalizeEmail(email);
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      email: { $regex: new RegExp(`^${normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") },
+    });
     // Always respond OK to prevent email enumeration
-    if (!user) return res.json({ message: "If that email exists, a reset link has been sent." });
+    if (!user) {
+      return res.json({ message: "If that email exists, a reset link has been sent." });
+    }
 
-    // Generate a secure token valid for 1 hour
     const token = crypto.randomBytes(32).toString("hex");
-    user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
-    await user.save();
+    const resetExpires = new Date(Date.now() + 60 * 60 * 1000);
+
+    await User.updateOne(
+      { _id: user._id },
+      {
+        $set: {
+          resetPasswordToken: token,
+          resetPasswordExpires: resetExpires,
+        },
+      }
+    );
 
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:8080";
     const resetUrl = `${frontendUrl}/reset-password?token=${token}${redirect ? `&redirect=${encodeURIComponent(String(redirect))}` : ""}`;
 
-    await sendPasswordResetEmail({ name: user.name, email: user.email, resetUrl });
-    res.json({ message: "If that email exists, a reset link has been sent." });
+    const mailResult = await sendPasswordResetEmail({
+      name: user.name,
+      email: user.email,
+      resetUrl,
+    });
+
+    if (mailResult.sent) {
+      return res.json({ message: "If that email exists, a reset link has been sent." });
+    }
+
+    console.error("[forgot-password] Email not sent:", mailResult.error);
+    return res.status(503).json({
+      error:
+        mailResult.error ||
+        "Unable to send reset email. Please try again later.",
+    });
   } catch (err) {
     console.error("forgot-password error:", err.message);
-    res.status(500).json({ error: "Failed to send reset email" });
+    res.status(500).json({
+      error: err.message || "Failed to process password reset request",
+    });
   }
 });
 
@@ -333,8 +382,9 @@ router.post("/forgot-password", async (req, res) => {
 router.post("/reset-password", async (req, res) => {
   try {
     const { token, newPassword } = req.body || {};
-    if (!token || !newPassword) return res.status(400).json({ error: "Token and new password are required" });
-    if (newPassword.length < 6) return res.status(400).json({ error: "Password must be at least 6 characters" });
+    if (!token || !newPassword) return badRequest(res, "Token and new password are required");
+    const pwdErr = validateNewPasswordForm(newPassword);
+    if (pwdErr) return badRequest(res, pwdErr);
 
     const user = await User.findOne({
       resetPasswordToken: token,

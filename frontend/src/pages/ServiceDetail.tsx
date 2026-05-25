@@ -1,4 +1,5 @@
 import { apiGetServiceById, apiCheckFavorite, apiAddFavorite, apiRemoveFavorite, apiValidatePromoCode } from "@/lib/api";
+import { formatCurrency } from "@/lib/utils";
 
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -73,7 +74,7 @@ const ServiceDetail = () => {
       setPromoError("");
       const data = await apiValidatePromoCode(promoCode.toUpperCase(), service.price, undefined, service._id, token || undefined);
       setAppliedPromo(data.promo);
-      toast.success(`Promo applied! You save ₹${data.discount}`);
+      toast.success(`Promo applied! You save ${formatCurrency(data.discount)}`);
     } catch (error: any) {
       setPromoError(error?.message || "Failed to validate promo code");
       setAppliedPromo(null);
@@ -87,7 +88,7 @@ const ServiceDetail = () => {
       setPromoError("");
       const data = await apiValidatePromoCode(code.toUpperCase(), service?.price || 0, undefined, service?._id, token || undefined);
       setAppliedPromo(data.promo);
-      toast.success(`Promo applied! You save ₹${data.discount}`);
+      toast.success(`Promo applied! You save ${formatCurrency(data.discount)}`);
     } catch (error: any) {
       setPromoError(error?.message || "Failed to validate promo code");
       setAppliedPromo(null);
@@ -148,7 +149,7 @@ const ServiceDetail = () => {
                   {service.createdBy?.name && (
                     <p className="mt-2 text-white/70 text-sm">By <span className="text-white font-medium">{service.createdBy.name}</span></p>
                   )}
-                  <p className="mt-2 text-white/70 text-sm">Starting from <span className="text-white font-bold text-lg">₹{service.price}</span></p>
+                  <p className="mt-2 text-white/70 text-sm">Starting from <span className="text-white font-bold text-lg">{formatCurrency(service.price)}</span></p>
                 </div>
               </div>
 
@@ -235,7 +236,7 @@ const ServiceDetail = () => {
                       {service.addOns.map((addon: any) => (
                         <div key={addon.name} className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-2.5">
                           <span className="text-sm font-medium">{addon.name}</span>
-                          <span className="text-sm font-semibold text-primary">+₹{addon.price}</span>
+                          <span className="text-sm font-semibold text-primary">+{formatCurrency(addon.price)}</span>
                         </div>
                       ))}
                     </div>
@@ -275,19 +276,19 @@ const ServiceDetail = () => {
                   <div className="rounded-xl bg-primary/10 border border-primary/20 p-5">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-muted-foreground">Base price</span>
-                      <span className="text-sm font-medium">₹{service.price}</span>
+                      <span className="text-sm font-medium">{formatCurrency(service.price)}</span>
                     </div>
                     {appliedPromo && (
                       <div className="flex items-center justify-between mb-2 text-green-600">
                         <span className="text-sm">Discount</span>
                         <span className="text-sm font-medium">
-                          -{appliedPromo.discountType === "percentage" ? `${appliedPromo.discountValue}%` : `₹${appliedPromo.discountValue}`}
+                          -{appliedPromo.discountType === "percentage" ? `${appliedPromo.discountValue}%` : `${formatCurrency(appliedPromo.discountValue)}`}
                         </span>
                       </div>
                     )}
                     <div className="border-t border-primary/20 mt-3 pt-3 flex items-center justify-between">
                       <span className="font-semibold">Total</span>
-                      <span className="font-display text-2xl font-bold text-gradient">₹{getFinalPrice()}</span>
+                      <span className="font-display text-2xl font-bold text-gradient">{formatCurrency(getFinalPrice())}</span>
                     </div>
                   </div>
                 </div>
@@ -323,7 +324,7 @@ const ServiceDetail = () => {
                     setShowPaymentModal(true);
                   }}
                 >
-                  Book Now — ₹{getFinalPrice()}
+                  Book Now — {formatCurrency(getFinalPrice())}
                 </Button>
               </div>
             </div>

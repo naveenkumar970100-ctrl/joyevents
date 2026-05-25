@@ -4,13 +4,21 @@ import AdminLayout from "@/components/AdminLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { apiCreateMerchant } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useEffect } from "react";
 import { apiCreateUser, apiListUsers, apiUpdateUser, apiDeleteUser, apiResetPassword } from "@/lib/api";
+import {
+  sanitizeEmailInput,
+  validateEmail,
+  validateSignupForm,
+  validateNewPasswordForm,
+  EMAIL_HINT,
+  PASSWORD_HINT,
+  EMAIL_MAX_LENGTH,
+} from "@/lib/validation";
 
 type UserData = { _id: string; name: string; email: string; role: string; createdAt: string; status?: string; events?: number };
 
@@ -56,6 +64,23 @@ const AdminUsers = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
+
+    const emailErr = validateEmail(formState.email);
+    if (emailErr) {
+      toast.error(emailErr);
+      return;
+    }
+
+    if (!formState.id) {
+      const signupErr = validateSignupForm(formState.email, formState.password, {
+        name: formState.name,
+      });
+      if (signupErr) {
+        toast.error(signupErr);
+        return;
+      }
+    }
+
     try {
       setIsSubmitting(true);
       if (formState.id) {
@@ -68,8 +93,9 @@ const AdminUsers = () => {
         
         // If password is provided, include it in the update
         if (formState.password && formState.password.trim() !== "") {
-          if (formState.password.length < 6) {
-            toast.error("Password must be at least 6 characters long");
+          const pwdErr = validateNewPasswordForm(formState.password);
+          if (pwdErr) {
+            toast.error(pwdErr);
             setIsSubmitting(false);
             return;
           }
@@ -138,8 +164,9 @@ const AdminUsers = () => {
     e.preventDefault();
     if (!token || !selectedUserForReset) return;
     
-    if (resetPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    const pwdErr = validateNewPasswordForm(resetPassword);
+    if (pwdErr) {
+      toast.error(pwdErr);
       return;
     }
     
@@ -185,11 +212,13 @@ const AdminUsers = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Email</Label>
-                  <Input type="email" required value={formState.email} onChange={(e) => setFormState({ ...formState, email: e.target.value })} />
+                  <Input type="text" inputMode="email" maxLength={EMAIL_MAX_LENGTH} required value={formState.email} onChange={(e) => setFormState({ ...formState, email: sanitizeEmailInput(e.target.value) })} />
+                  <p className="text-xs text-muted-foreground">{EMAIL_HINT}</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Password</Label>
                   <Input type="password" required value={formState.password} onChange={(e) => setFormState({ ...formState, password: e.target.value })} />
+                  <p className="text-xs text-muted-foreground">{PASSWORD_HINT}</p>
                 </div>
                 <DialogFooter>
                   <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Creating..." : "Create Account"}</Button>
@@ -211,7 +240,8 @@ const AdminUsers = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Email</Label>
-                  <Input type="email" required value={formState.email} onChange={(e) => setFormState({ ...formState, email: e.target.value })} />
+                  <Input type="text" inputMode="email" maxLength={EMAIL_MAX_LENGTH} required value={formState.email} onChange={(e) => setFormState({ ...formState, email: sanitizeEmailInput(e.target.value) })} />
+                  <p className="text-xs text-muted-foreground">{EMAIL_HINT}</p>
                 </div>
                 <div className="space-y-2">
                   <Label>New Password (Optional)</Label>
@@ -220,10 +250,9 @@ const AdminUsers = () => {
                     value={formState.password} 
                     onChange={(e) => setFormState({ ...formState, password: e.target.value })}
                     placeholder="Leave empty to keep current password"
-                    minLength={6}
                   />
                   <p className="text-xs text-muted-foreground">
-                    {formState.password ? "Password will be updated" : "Leave empty to keep current password"}
+                    {formState.password ? PASSWORD_HINT : "Leave empty to keep current password"}
                   </p>
                 </div>
                 <DialogFooter>
@@ -357,9 +386,8 @@ const AdminUsers = () => {
                   value={resetPassword} 
                   onChange={(e) => setResetPassword(e.target.value)}
                   placeholder="Enter new password"
-                  minLength={6}
                 />
-                <p className="text-xs text-muted-foreground">Password must be at least 6 characters long</p>
+                <p className="text-xs text-muted-foreground">{PASSWORD_HINT}</p>
               </div>
               <DialogFooter>
                 <Button 

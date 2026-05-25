@@ -1,4 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Clock, MapPin, Users, DollarSign, Share2, Heart, Image as ImageIcon, X, ChevronLeft, ChevronRight, Ticket, Check, Tag, Copy, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -219,7 +220,7 @@ const EventDetail = () => {
       setPromoError("");
       const data = await apiValidatePromoCode(promoCode.toUpperCase(), getTicketPrice(), event._id, undefined, token || undefined);
       setAppliedPromo(data.promo);
-      toast.success(`Promo code applied! You save ₹${data.discount}`);
+      toast.success(`Promo code applied! You save ${formatCurrency(data.discount)}`);
     } catch (error: any) {
       setPromoError(error?.message || "Failed to validate promo code");
       setAppliedPromo(null);
@@ -239,7 +240,7 @@ const EventDetail = () => {
       setPromoError("");
       const data = await apiValidatePromoCode(code.toUpperCase(), getTicketPrice(), event?._id, undefined, token || undefined);
       setAppliedPromo(data.promo);
-      toast.success(`Promo code applied! You save ₹${data.discount}`);
+      toast.success(`Promo code applied! You save ${formatCurrency(data.discount)}`);
     } catch (error: any) {
       setPromoError(error?.message || "Failed to validate promo code");
       setAppliedPromo(null);
@@ -387,7 +388,7 @@ const EventDetail = () => {
                   </div>
                 ) : (
                   <div className="flex items-center justify-between">
-                    <span className="font-display text-3xl font-bold text-gradient">₹{event.price}</span>
+                    <span className="font-display text-3xl font-bold text-gradient">{formatCurrency(event.price)}</span>
                     <span className="text-sm text-muted-foreground">per person</span>
                   </div>
                 )}
@@ -480,7 +481,7 @@ const EventDetail = () => {
                                   <div>
                                     <span className={`text-sm capitalize ${s.label}`}>{t.type}</span>
                                     <div className="flex items-center gap-2 mt-0.5">
-                                      <span className={`text-sm font-bold ${s.price}`}>₹{t.price}</span>
+                                      <span className={`text-sm font-bold ${s.price}`}>{formatCurrency(t.price)}</span>
                                       {remaining <= 0
                                         ? <span className="text-xs text-red-400 font-semibold">Sold Out</span>
                                         : <span className={`text-xs px-1.5 py-0.5 rounded-full border ${s.badge}`}>{remaining} left</span>}
@@ -510,7 +511,7 @@ const EventDetail = () => {
                           <button onClick={() => setFullServiceQty(q => Math.max(1, q - 1))} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">−</button>
                           <span className="w-10 text-center font-semibold text-lg">{fullServiceQty}</span>
                           <button onClick={() => setFullServiceQty(q => q + 1)} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">+</button>
-                          <span className="text-xs text-muted-foreground ml-1">× ₹{event.price} each</span>
+                          <span className="text-xs text-muted-foreground ml-1">× {formatCurrency(event.price)} each</span>
                         </div>
                       </div>
                     )}
@@ -548,16 +549,16 @@ const EventDetail = () => {
                       {appliedPromo && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-muted-foreground">Subtotal:</span>
-                          <span className="line-through text-muted-foreground">₹{getTicketPrice()}</span>
+                          <span className="line-through text-muted-foreground">{formatCurrency(getTicketPrice())}</span>
                         </div>
                       )}
                       <div className="flex items-center justify-between">
                         <span className="font-display text-lg font-semibold">Total:</span>
-                        <span className="font-display text-2xl font-bold text-gradient">₹{getFinalPrice().toFixed(0)}</span>
+                        <span className="font-display text-2xl font-bold text-gradient">{formatCurrency(getFinalPrice(), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                       </div>
                       {appliedPromo && (
                         <p className="text-xs text-green-600 font-semibold">
-                          You save ₹{(getTicketPrice() - getFinalPrice()).toFixed(0)}
+                          You save {formatCurrency(getTicketPrice() - getFinalPrice(), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                         </p>
                       )}
                     </div>
@@ -592,10 +593,10 @@ const EventDetail = () => {
                             : event.tickets?.every((t: any) => ((t.available || 0) - (t.sold || 0)) <= 0);
                           if (soldOut) return "Sold Out";
                           const total = Object.values(selectedTickets).reduce((s: number, q: any) => s + q, 0);
-                          return total === 0 ? "Select Tickets to Continue" : `Confirm Booking — ₹${getFinalPrice().toFixed(0)}`;
+                          return total === 0 ? "Select Tickets to Continue" : `Confirm Booking — ${formatCurrency(getFinalPrice(), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
                         }
                         if (maxAttendees > 0 && attendeesCount >= maxAttendees) return "Full";
-                        return fullServiceQty === 0 ? "Select Tickets to Continue" : `Confirm Booking — ₹${getFinalPrice().toFixed(0)}`;
+                        return fullServiceQty === 0 ? "Select Tickets to Continue" : `Confirm Booking — ${formatCurrency(getFinalPrice(), { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
                       })()}
                     </Button>
                   </>
@@ -613,7 +614,7 @@ const EventDetail = () => {
                           <button onClick={() => setFullServiceQty(q => Math.max(1, q - 1))} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">−</button>
                           <span className="w-10 text-center font-semibold text-lg">{fullServiceQty}</span>
                           <button onClick={() => setFullServiceQty(q => q + 1)} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">+</button>
-                          <span className="text-xs text-muted-foreground ml-1">× ₹{event.price} each</span>
+                          <span className="text-xs text-muted-foreground ml-1">× {formatCurrency(event.price)} each</span>
                         </div>
                       </div>
                     )}
@@ -894,7 +895,7 @@ const EventDetail = () => {
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex-1">
                               <p className="font-display font-semibold capitalize text-lg">{ticket.type}</p>
-                              <p className="text-sm text-muted-foreground">₹{ticket.price} per ticket</p>
+                              <p className="text-sm text-muted-foreground">{formatCurrency(ticket.price)} per ticket</p>
                             </div>
                             <div className="text-right">
                               {isSoldOut ? (
@@ -949,7 +950,7 @@ const EventDetail = () => {
                               </button>
                               {quantity > 0 && (
                                 <div className="text-right">
-                                  <p className="text-sm font-semibold text-primary">₹{ticket.price * quantity}</p>
+                                  <p className="text-sm font-semibold text-primary">{formatCurrency(ticket.price * quantity)}</p>
                                 </div>
                               )}
                             </div>
@@ -972,7 +973,7 @@ const EventDetail = () => {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex-1">
                         <p className="font-display font-semibold capitalize text-lg">{ticket.type}</p>
-                        <p className="text-sm text-muted-foreground">₹{ticket.price} per ticket</p>
+                        <p className="text-sm text-muted-foreground">{formatCurrency(ticket.price)} per ticket</p>
                       </div>
                       <div className="text-right">
                         {isSoldOut ? (
@@ -1027,7 +1028,7 @@ const EventDetail = () => {
                         </button>
                         {quantity > 0 && (
                           <div className="text-right">
-                            <p className="text-sm font-semibold text-primary">₹{ticket.price * quantity}</p>
+                            <p className="text-sm font-semibold text-primary">{formatCurrency(ticket.price * quantity)}</p>
                           </div>
                         )}
                       </div>
@@ -1042,7 +1043,7 @@ const EventDetail = () => {
             <div className="mt-6 p-4 rounded-lg bg-primary/10 border border-primary/20">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-display text-lg font-semibold">Total Price:</span>
-                <span className="font-display text-2xl font-bold text-gradient">₹{getTicketPrice()}</span>
+                <span className="font-display text-2xl font-bold text-gradient">{formatCurrency(getTicketPrice())}</span>
               </div>
               <div className="text-sm text-muted-foreground space-y-1 mb-4">
                 {Object.entries(selectedTickets).map(([type, qty]: any) => {
@@ -1056,7 +1057,7 @@ const EventDetail = () => {
                     return (
                       <p key={type} className="capitalize flex items-center justify-between">
                         <span>{type} × {qty}</span>
-                        <span>₹{(ticket?.price || 0) * qty}</span>
+                        <span>{formatCurrency((ticket?.price || 0) * qty)}</span>
                       </p>
                     );
                   }

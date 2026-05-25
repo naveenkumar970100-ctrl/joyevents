@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
 
@@ -200,7 +201,7 @@ const SeatSelection = ({ eventType, tickets = [], maxAttendees = 0, attendeesCou
                     <span className="text-lg">{TIER_EMOJI[ticket.type] || "🎫"}</span>
                     <span className={`font-bold capitalize text-base ${colors.text}`}>{ticket.type}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${colors.badge}`}>
-                      ₹{ticket.price}
+                      {formatCurrency(ticket.price)}
                     </span>
                   </div>
                   <div className="text-right">
@@ -302,13 +303,13 @@ const SeatSelection = ({ eventType, tickets = [], maxAttendees = 0, attendeesCou
                 return (
                   <div key={t.type} className="flex justify-between text-muted-foreground capitalize">
                     <span>{TIER_EMOJI[t.type]} {t.type} × {count}</span>
-                    <span>₹{t.price * count}</span>
+                    <span>{formatCurrency(t.price * count)}</span>
                   </div>
                 );
               })}
               <div className="flex justify-between font-bold text-base pt-1 border-t border-border">
                 <span>Total ({totalSelected} seats)</span>
-                <span className="text-gradient">₹{totalTicketed}</span>
+                <span className="text-gradient">{formatCurrency(totalTicketed)}</span>
               </div>
             </div>
           )}
@@ -316,7 +317,7 @@ const SeatSelection = ({ eventType, tickets = [], maxAttendees = 0, attendeesCou
           {eventType === "fullService" && fsSelectedSeats.length > 0 && (
             <div className="flex justify-between font-bold text-base">
               <span>Total ({fsSelectedSeats.length} seats)</span>
-              <span className="text-gradient">₹{price * fsSelectedSeats.length}</span>
+              <span className="text-gradient">{formatCurrency(price * fsSelectedSeats.length)}</span>
             </div>
           )}
 
@@ -328,8 +329,8 @@ const SeatSelection = ({ eventType, tickets = [], maxAttendees = 0, attendeesCou
           >
             <Check className="mr-2 h-4 w-4" />
             Confirm {eventType === "ticketed" ? `${totalSelected} Seat${totalSelected !== 1 ? "s" : ""}` : `${fsSelectedSeats.length} Seat${fsSelectedSeats.length !== 1 ? "s" : ""}`}
-            {eventType === "ticketed" && totalSelected > 0 ? ` — ₹${totalTicketed}` : ""}
-            {eventType === "fullService" && fsSelectedSeats.length > 0 ? ` — ₹${price * fsSelectedSeats.length}` : ""}
+            {eventType === "ticketed" && totalSelected > 0 ? ` — ${formatCurrency(totalTicketed)}` : ""}
+            {eventType === "fullService" && fsSelectedSeats.length > 0 ? ` — ${formatCurrency(price * fsSelectedSeats.length)}` : ""}
           </Button>
         </div>
       )}

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Sparkles, TrendingUp, Users, X, Briefcase, Loader2, Video, ChevronLeft, ChevronRight, Ticket, Copy, Star, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -188,14 +189,13 @@ const Index = () => {
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="relative isolate overflow-hidden h-[75vh] flex items-center">
-        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80" alt="Event celebration" className="absolute inset-0 h-full w-full object-cover" loading="eager" />
+      {/* Hero — same proportions as Portfolio page (75vh, content overlaid) */}
+      <section className="relative isolate overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80" alt="Event celebration" className="h-[55vh] min-h-[320px] w-full object-cover sm:h-[60vh] md:h-[65vh] lg:h-[75vh]" loading="eager" />
         <div className="absolute inset-0 bg-black/55" />
         <div className="absolute inset-0" style={{ background: "var(--gradient-glow)" }} />
-
-        <div className="relative w-full">
-          <div className="container mx-auto py-24 sm:py-20">
+        <div className="absolute inset-0 flex items-center">
+          <div className="container mx-auto px-4 sm:px-6">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
@@ -206,54 +206,61 @@ const Index = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="mb-2 sm:mb-5 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 sm:py-1.5 text-xs sm:text-sm text-primary"
+                className="mb-3 sm:mb-4 inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs sm:text-sm text-primary"
               >
-                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Discover Extraordinary Events</span>
-                <span className="sm:hidden">Discover Events</span>
+                <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                <span>Discover Extraordinary Events</span>
               </motion.div>
-              <h1 className="font-display text-2xl font-bold leading-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                <span className="text-white">Create </span>
-                <span className="text-gradient">Unforgettable</span>
-                <span className="text-white"> Moments</span>
+              <h1 className="font-display text-2xl font-bold leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+                Create <span className="text-gradient">Unforgettable</span> Moments
               </h1>
-              <p className="mt-2 sm:mt-4 max-w-xl text-xs sm:text-base lg:text-lg text-white/80 line-clamp-2 sm:line-clamp-none">
+              <p className="mt-3 sm:mt-4 max-w-xl text-sm sm:text-base text-white/80">
                 From intimate workshops to grand festivals — discover, book, and manage events
                 that bring people together and create lasting memories.
               </p>
-              <div className="mt-3 sm:mt-6 flex flex-wrap gap-2 sm:gap-3">
+              <div className="mt-5 sm:mt-6 flex flex-wrap gap-2 sm:gap-3">
                 <Link to="/events">
-                  <Button size="sm" className="bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-glow text-xs sm:text-base sm:size-lg h-8 sm:h-11">
-                    Explore Events <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
+                  <Button className="bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-glow">
+                    Explore Events <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button size="sm" variant="outline" className="text-xs sm:text-base sm:size-lg h-8 sm:h-11">
+                  <Button variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white/20">
                     Start Hosting
                   </Button>
                 </Link>
               </div>
             </motion.div>
-
-            {/* Stats Row */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="mt-3 sm:mt-10 grid grid-cols-3 gap-2 sm:gap-4 max-w-[200px] sm:max-w-sm"
-            >
-              {[
-                { label: "Events", value: "1,800+" },
-                { label: "Attendees", value: "50K+" },
-                { label: "Merchants", value: "340+" },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <p className="font-display text-sm sm:text-2xl font-bold text-gradient">{stat.value}</p>
-                  <p className="text-[9px] sm:text-sm text-white/70">{stat.label}</p>
-                </div>
-              ))}
-            </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Stats — separate bar below hero (Portfolio-style), always fully visible */}
+      <section className="border-y border-border bg-secondary/30 py-6 sm:py-8">
+        <div className="container mx-auto px-4 sm:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="grid grid-cols-3 gap-4 text-center sm:gap-8"
+          >
+            {[
+              { label: "Events", value: "1,800+" },
+              { label: "Attendees", value: "50K+" },
+              { label: "Merchants", value: "340+" },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+              >
+                <div className="font-display text-xl font-bold text-primary sm:text-3xl md:text-4xl">{stat.value}</div>
+                <div className="mt-1 text-xs text-muted-foreground sm:text-sm">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
@@ -355,13 +362,13 @@ const Index = () => {
                         )}
                         {promo.minBookingAmount > 0 && (
                           <span className="text-[10px] font-semibold rounded-full bg-amber-500/15 text-amber-600 px-2 py-0.5">
-                            Min ₹{promo.minBookingAmount}
+                            Min {formatCurrency(promo.minBookingAmount)}
                           </span>
                         )}
                       </div>
                       {promo.minBookingAmount > 0 && (
                         <p className="text-[11px] text-amber-700/90 dark:text-amber-300 mt-1">
-                          Spend ₹{promo.minBookingAmount}+ to get {promo.discountType === "percentage" ? `${promo.discountValue}% off` : `₹${promo.discountValue} off`}
+                          Spend {formatCurrency(promo.minBookingAmount)}+ to get {promo.discountType === "percentage" ? `${promo.discountValue}% off` : `${formatCurrency(promo.discountValue)} off`}
                         </p>
                       )}
                     </div>
@@ -377,7 +384,7 @@ const Index = () => {
                   </div>
                   <div className="flex items-center justify-between pt-3 border-t border-amber-200/30">
                     <span className="font-semibold text-amber-600 dark:text-amber-400">
-                      {promo.discountType === "percentage" ? `${promo.discountValue}% OFF` : `₹${promo.discountValue} OFF`}
+                      {promo.discountType === "percentage" ? `${promo.discountValue}% OFF` : `${formatCurrency(promo.discountValue)} OFF`}
                     </span>
                     <div className="flex items-center gap-3">
                       {promo.merchant?.name && (
@@ -524,7 +531,7 @@ const Index = () => {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <span className="absolute bottom-3 left-3 rounded-full bg-gradient-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                      From ₹{svc.price}
+                      From {formatCurrency(svc.price)}
                     </span>
                   </div>
 

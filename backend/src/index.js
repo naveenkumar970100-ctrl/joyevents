@@ -19,11 +19,12 @@ import contactRoutes from "./routes/contact.js";
 import recommendationRoutes from "./routes/recommendations.js";
 import translateRoutes from "./routes/translate.js";
 import { connectDB } from "./config/db.js";
+import { getSmtpConfig, isSmtpConfigured } from "./utils/sendEmail.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-dotenv.config();
+dotenv.config({ path: resolve(__dirname, "../.env") });
 if (!process.env.MONGO_URI) {
   const rootEnv = resolve(__dirname, "../../.env");
   dotenv.config({ path: rootEnv });
@@ -136,9 +137,36 @@ if (process.env.SERVE_FRONTEND === "true") {
   }
 }
 
+async function logSmtpStatus() {
+  if (!isSmtpConfigured()) {
+    console.warn("[email] SMTP_USER / SMTP_PASS not set — password reset emails will fail");
+    return;
+  }
+  const { user, host, port } = getSmtpConfig();
+  try {
+    const nodemailer = (await import("nodemailer")).default;
+    const { pass, secure } = getSmtpConfig();
+    const t = nodemailer.createTransport({
+      host,
+      port,
+      secure,
+      auth: { user, pass },
+      requireTLS: !secure && port === 587,
+    });
+    await t.verify();
+    console.log(`[email] SMTP ready (${user} via ${host}:${port})`);
+  } catch (err) {
+    console.error(
+      `[email] SMTP login failed for ${user} — regenerate a Gmail App Password and update SMTP_PASS in backend/.env`
+    );
+    console.error(`[email] ${err.message}`);
+  }
+}
+
 async function start() {
   try {
     await connectDB();
+    logSmtpStatus().catch(() => {});
 
     const server = app.listen(PORT, "0.0.0.0", () => {
       console.log(`API server running on http://0.0.0.0:${PORT}`);

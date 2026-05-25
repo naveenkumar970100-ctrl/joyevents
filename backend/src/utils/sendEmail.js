@@ -1,18 +1,60 @@
 import nodemailer from "nodemailer";
 
-const getTransporter = () =>
-  nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
+const trim = (v) => (typeof v === "string" ? v.trim() : v);
+
+/** Normalize env vars (trailing spaces in .env break Gmail auth). */
+export const getSmtpConfig = () => {
+  const user = trim(process.env.SMTP_USER);
+  let pass = trim(process.env.SMTP_PASS);
+  if (pass) pass = pass.replace(/\s+/g, "");
+
+  const host = trim(process.env.SMTP_HOST) || "smtp.gmail.com";
+  const port = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587;
+  const secure = process.env.SMTP_SECURE === "true" || port === 465;
+
+  let from = trim(process.env.MAIL_FROM);
+  if (from && !from.includes("<")) {
+    const match = from.match(/^(.+?)([\w.+-]+@[\w.-]+\.\w+)$/);
+    if (match) {
+      from = `"${match[1].trim()}" <${match[2].trim()}>`;
+    } else if (user) {
+      from = `"JoyEvents" <${user}>`;
+    }
+  }
+  if (!from && user) from = `"JoyEvents" <${user}>`;
+
+  return { user, pass, host, port, secure, from };
+};
+
+export const isSmtpConfigured = () => {
+  const { user, pass } = getSmtpConfig();
+  return Boolean(user && pass);
+};
+
+const getTransporter = () => {
+  const { user, pass, host, port, secure } = getSmtpConfig();
+  if (!user || !pass) return null;
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: { user, pass },
+    tls: { minVersion: "TLSv1.2" },
+    requireTLS: !secure && port === 587,
   });
+};
 
 export const sendMerchantCredentials = async ({ name, email, password }) => {
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.warn("[email] SMTP not configured — merchant credentials not emailed");
+    return false;
+  }
+  const { from } = getSmtpConfig();
   try {
-    await getTransporter().sendMail({
-      from: `"JoyEvents Admin" <${process.env.SMTP_USER}>`,
+    await transporter.sendMail({
+      from,
       to: email,
       subject: "Welcome to JoyEvents! Your Merchant Account Created",
       html: `
@@ -24,7 +66,7 @@ export const sendMerchantCredentials = async ({ name, email, password }) => {
             <p><strong>Email:</strong> ${email}</p>
             <p><strong>Password:</strong> ${password}</p>
           </div>
-          <p style="margin-top: 20px;">Please login at <a href="${process.env.FRONTEND_URL || 'http://localhost:8080'}/login">JoyEvents</a> and change your password as soon as possible.</p>
+          <p style="margin-top: 20px;">Please login at <a href="${process.env.FRONTEND_URL || "http://localhost:8080"}/login">JoyEvents</a> and change your password as soon as possible.</p>
           <p>Best regards,<br>The JoyEvents Team</p>
         </div>
       `,
@@ -37,11 +79,36 @@ export const sendMerchantCredentials = async ({ name, email, password }) => {
 };
 
 export const sendPasswordResetEmail = async ({ name, email, resetUrl }) => {
+  const transporter = getTransporter();
+  if (!transporter) {
+    return {
+      sent: false,
+      error: "Email is not configured on the server. Contact support.",
+    };
+  }
+
+  const { from, user } = getSmtpConfig();
+
   try {
-    await getTransporter().sendMail({
-      from: `"JoyEvents" <${process.env.SMTP_USER}>`,
+    await transporter.verify();
+  } catch (error) {
+    console.error("SMTP verify failed:", error.message);
+    const hint =
+      error.message?.includes("Invalid login") ||
+      error.message?.includes("authentication") ||
+      error.message?.includes("535")
+        ? "Gmail rejected the login. Use a 16-character App Password (Google Account → Security → App passwords), not your normal password."
+        : error.message;
+    return { sent: false, error: hint };
+  }
+
+  try {
+    const info = await transporter.sendMail({
+      from,
       to: email,
+      replyTo: user,
       subject: "Reset Your Password — JoyEvents",
+      text: `Hi ${name},\n\nReset your password: ${resetUrl}\n\nThis link expires in 1 hour.\n`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
           <div style="background: linear-gradient(135deg, #FF5A00, #FF8C00); padding: 30px; text-align: center;">
@@ -56,23 +123,46 @@ export const sendPasswordResetEmail = async ({ name, email, resetUrl }) => {
               </a>
             </div>
             <p style="color: #888; font-size: 13px;">This link expires in <strong>1 hour</strong>. If you didn't request this, you can safely ignore this email.</p>
+            <p style="color: #aaa; font-size: 12px; word-break: break-all;">Or copy this link: ${resetUrl}</p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-            <p style="color: #aaa; font-size: 12px; text-align: center;">JoyEvents &mdash; Manage your events with ease</p>
+            <p style="color: #aaa; font-size: 12px; text-align: center;">JoyEvents</p>
           </div>
         </div>
       `,
     });
-    return true;
+    console.log(`[email] Password reset sent to ${email} (messageId: ${info.messageId})`);
+    return { sent: true };
   } catch (error) {
     console.error("sendPasswordResetEmail error:", error.message);
-    throw new Error("Failed to send reset email: " + error.message);
+    return {
+      sent: false,
+      error:
+        error.message?.includes("Invalid login") ||
+        error.message?.includes("authentication") ||
+        error.message?.includes("535")
+          ? "Could not send email. The server Gmail login failed — regenerate an App Password and update SMTP_PASS in backend .env."
+          : `Could not send email: ${error.message}`,
+    };
   }
 };
 
-export const sendContactMessage = async ({ senderName, senderEmail, message, merchantEmail, merchantName, itemTitle }) => {
+export const sendContactMessage = async ({
+  senderName,
+  senderEmail,
+  message,
+  merchantEmail,
+  merchantName,
+  itemTitle,
+}) => {
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.warn("[email] SMTP not configured — contact message not emailed");
+    return false;
+  }
+  const { from } = getSmtpConfig();
   try {
-    await getTransporter().sendMail({
-      from: `"JoyEvents" <${process.env.SMTP_USER}>`,
+    await transporter.sendMail({
+      from,
       to: merchantEmail,
       replyTo: senderEmail,
       subject: `New enquiry about "${itemTitle}" — JoyEvents`,
@@ -90,7 +180,7 @@ export const sendContactMessage = async ({ senderName, senderEmail, message, mer
             </div>
             <p style="color: #555; font-size: 13px;">You can reply directly to this email to respond to the customer.</p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-            <p style="color: #aaa; font-size: 12px; text-align: center;">JoyEvents &mdash; Connecting customers with great experiences</p>
+            <p style="color: #aaa; font-size: 12px; text-align: center;">JoyEvents</p>
           </div>
         </div>
       `,

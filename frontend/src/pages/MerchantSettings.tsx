@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import MerchantLayout from "@/components/MerchantLayout";
+import { validateNewPasswordForm, PASSWORD_HINT } from "@/lib/validation";
 import { Link, useNavigate } from"react-router-dom";
 import { toast } from"sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,14 +37,13 @@ const handlePasswordChange = async (e: React.FormEvent) => {
   return;
   }
 
-  if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-  toast.error("New passwords do not match");
-  return;
-  }
-
-  if (passwordForm.newPassword.length < 6) {
-  toast.error("Password must be at least 6 characters long");
-  return;
+  const pwdErr = validateNewPasswordForm(
+    passwordForm.newPassword,
+    passwordForm.confirmPassword
+  );
+  if (pwdErr) {
+    toast.error(pwdErr);
+    return;
   }
 
   setLoading(true);
@@ -178,6 +178,7 @@ const handlePasswordChange = async (e: React.FormEvent) => {
                    {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                  </button>
                </div>
+               <p className="mt-1 text-xs text-muted-foreground">{PASSWORD_HINT}</p>
              </div>
              
              <div>

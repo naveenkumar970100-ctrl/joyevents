@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { ArrowLeft, Calendar, AlertCircle, MapPin, ExternalLink, Check, X, Loader2, CreditCard } from "lucide-react";
 import MerchantLayout from "@/components/MerchantLayout";
 import { Button } from "@/components/ui/button";
@@ -87,7 +88,7 @@ const MerchantBookings = () => {
       if (!res.ok) throw new Error("Failed to approve booking");
       
       toast.success(paymentType === "advance" 
-        ? `Booking approved with advance payment of ₹${customAdvanceAmount || "30%"}!` 
+        ? `Booking approved with advance payment of ${formatCurrency(customAdvanceAmount || "30%")}!` 
         : "Booking approved with full payment requirement!");
       setApprovalOptions({ id: "", show: false });
       setCustomAdvance("");
@@ -406,7 +407,7 @@ const MerchantBookings = () => {
                       disabled={!customAdvance || Number(customAdvance) <= 0 || approving === approvalOptions.id}
                       onClick={() => handleApprove(approvalOptions.id, "advance", Number(customAdvance))}
                     >
-                      Confirm ₹{customAdvance || "0"} Advance
+                      Confirm {formatCurrency(customAdvance || "0")} Advance
                     </Button>
                   </div>
                 )}

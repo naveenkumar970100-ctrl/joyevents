@@ -5,6 +5,7 @@ import Service from "../models/Service.js";
 import Message from "../models/Message.js";
 import { verifyToken } from "../middleware/auth.js";
 import { sendContactMessage } from "../utils/sendEmail.js";
+import { validateEmail, normalizeEmail } from "../utils/validation.js";
 
 const router = express.Router();
 
@@ -14,6 +15,9 @@ router.post("/merchant", async (req, res) => {
   if (!senderName?.trim() || !senderEmail?.trim() || !message?.trim()) {
     return res.status(400).json({ error: "Name, email and message are required" });
   }
+  const emailErr = validateEmail(senderEmail);
+  if (emailErr) return res.status(400).json({ error: emailErr });
+  const normalizedSenderEmail = normalizeEmail(senderEmail);
   try {
     let merchant = null;
     let itemTitle = "your listing";
@@ -34,7 +38,7 @@ router.post("/merchant", async (req, res) => {
 
     await Message.create({
       senderName: senderName.trim(),
-      senderEmail: senderEmail.trim(),
+      senderEmail: normalizedSenderEmail,
       message: message.trim(),
       merchant: merchant._id,
       eventId: resolvedEventId,
@@ -45,7 +49,7 @@ router.post("/merchant", async (req, res) => {
 
     sendContactMessage({
       senderName: senderName.trim(),
-      senderEmail: senderEmail.trim(),
+      senderEmail: normalizedSenderEmail,
       message: message.trim(),
       merchantEmail: merchant.email,
       merchantName: merchant.name,

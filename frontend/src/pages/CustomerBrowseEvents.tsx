@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Search, Loader2, CalendarDays, ArrowLeft, SlidersHorizontal, X, Mail } from "lucide-react";
 import CustomerLayout from "@/components/CustomerLayout";
@@ -242,7 +243,7 @@ const CustomerBrowseEvents = () => {
                         </span>
                         <div className="text-right">
                           <p className="text-lg font-bold text-primary">
-                            {promo.discountType === 'percentage' ? `${promo.discountValue}% OFF` : `₹${promo.discountValue} OFF`}
+                            {promo.discountType === 'percentage' ? `${promo.discountValue}% OFF` : `${formatCurrency(promo.discountValue)} OFF`}
                           </p>
                         </div>
                       </div>
@@ -250,7 +251,7 @@ const CustomerBrowseEvents = () => {
                       <div className="mt-auto pt-2 flex items-center justify-between text-[10px] text-muted-foreground uppercase tracking-tight">
                         <span className="flex items-center gap-1">
                           <Ticket className="h-3 w-3" />
-                          Min. ₹{promo.minBookingAmount || 0}
+                          Min. {formatCurrency(promo.minBookingAmount || 0)}
                         </span>
                         {promo.expiryDate && (
                           <span>Expires: {new Date(promo.expiryDate).toLocaleDateString()}</span>
@@ -389,7 +390,7 @@ const CustomerBrowseEvents = () => {
                 )}
                 {(priceMin || priceMax) && (
                   <span className="flex items-center gap-1 rounded-full bg-primary/15 border border-primary/30 px-3 py-1 text-xs font-medium text-primary">
-                    ₹{priceMin || "0"} – ₹{priceMax || "∞"}
+                    {formatCurrency(priceMin || "0")} – {formatCurrency(priceMax || "∞")}
                     <button onClick={() => { setPriceMin(""); setPriceMax(""); }}><X className="h-3 w-3" /></button>
                   </span>
                 )}
@@ -451,13 +452,13 @@ const CustomerBrowseEvents = () => {
                         // For ticketed events, show min ticket price
                         if (event.eventType === "ticketed" && event.tickets?.length > 0) {
                           const minPrice = Math.min(...event.tickets.map((t: any) => t.price || 0).filter((p: number) => p > 0));
-                          return minPrice > 0 ? `Starts from ₹${minPrice}` : `Starts from ₹${event.price || 0}`;
+                          return minPrice > 0 ? `Starts from ${formatCurrency(minPrice)}` : `Starts from ${formatCurrency(event.price || 0)}`;
                         }
                         // For session events
                         if (event.eventType === "ticketed" && event.hasMultipleSessions) {
-                          return `Starts from ₹${event.price || 0}`;
+                          return `Starts from ${formatCurrency(event.price || 0)}`;
                         }
-                        return event.price > 0 ? `Starts from ₹${event.price}` : `Starts from ₹0`;
+                        return event.price > 0 ? `Starts from ${formatCurrency(event.price)}` : `Starts from ${formatCurrency(0)}`;
                       })()}
                     </span>
                     {role === "customer" && (

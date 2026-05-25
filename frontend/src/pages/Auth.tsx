@@ -10,6 +10,14 @@ import { toast } from "sonner";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { dashboardPaths, roleLabels } from "@/lib/auth";
 import { apiLogin, apiRegister } from "@/lib/api";
+import {
+  sanitizeEmailInput,
+  validateLoginForm,
+  validateSignupForm,
+  EMAIL_HINT,
+  PASSWORD_HINT,
+  EMAIL_MAX_LENGTH,
+} from "@/lib/validation";
 
 const Auth = () => {
   const location = useLocation();
@@ -29,6 +37,13 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const formErr = isLogin
+      ? validateLoginForm(email, password)
+      : validateSignupForm(email, password, { name });
+    if (formErr) {
+      toast.error(formErr);
+      return;
+    }
     try {
       const payloadRole = role;
       const res = isLogin
@@ -84,8 +99,9 @@ const Auth = () => {
               <Label className="text-sm text-muted-foreground">Email</Label>
               <div className="relative mt-1">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input type="email" placeholder="hello@example.com" className="border-border bg-secondary pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input type="text" inputMode="email" autoComplete="email" placeholder="user@gmail.com" maxLength={EMAIL_MAX_LENGTH} className="border-border bg-secondary pl-10" value={email} onChange={(e) => setEmail(sanitizeEmailInput(e.target.value))} />
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">{EMAIL_HINT}</p>
             </div>
             <div>
               <Label className="text-sm text-muted-foreground">Password</Label>
@@ -93,6 +109,7 @@ const Auth = () => {
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input type="password" placeholder="••••••••" className="border-border bg-secondary pl-10" value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
+              {!isLogin && <p className="mt-1 text-xs text-muted-foreground">{PASSWORD_HINT}</p>}
             </div>
 
             <Button type="submit" className="w-full bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90" size="lg">

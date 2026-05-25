@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { Tag, Copy, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { apiGetAllPromoCodes } from "@/lib/api";
 import { toast } from "sonner";
@@ -108,12 +109,12 @@ const AvailablePromoCodes = ({ onApply, appliedCode, eventId, serviceId, merchan
           const isApplied = appliedCode === promo.code;
           const discountLabel = promo.discountType === "percentage"
             ? `${promo.discountValue}% off`
-            : `₹${promo.discountValue} off`;
+            : `${formatCurrency(promo.discountValue)} off`;
           const usageLeft = promo.usageLimit > 0
             ? `${promo.usageLimit - (promo.usedCount || 0)} uses left`
             : null;
           const minText = promo.minBookingAmount && Number(promo.minBookingAmount) > 0
-            ? `Spend ₹${Number(promo.minBookingAmount)}+ to get ${discountLabel}`
+            ? `Spend ${formatCurrency(Number(promo.minBookingAmount))}+ to get ${discountLabel}`
             : null;
 
           return (
@@ -133,7 +134,7 @@ const AvailablePromoCodes = ({ onApply, appliedCode, eventId, serviceId, merchan
                   </span>
                   {minText && (
                     <span className="text-xs rounded-full bg-amber-500/15 text-amber-600 px-2 py-0.5 font-medium">
-                      Min ₹{Number(promo.minBookingAmount)}
+                      Min {formatCurrency(Number(promo.minBookingAmount))}
                     </span>
                   )}
                 </div>

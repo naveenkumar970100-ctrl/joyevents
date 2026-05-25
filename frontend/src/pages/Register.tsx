@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { apiRegister } from "@/lib/api";
 import { Link } from "react-router-dom";
+import { sanitizeEmailInput, validateSignupForm, EMAIL_HINT, PASSWORD_HINT, EMAIL_MAX_LENGTH } from "@/lib/validation";
 const Register = () => {
   const { role } = useAuth();
   const navigate = useNavigate();
@@ -24,6 +25,11 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const formErr = validateSignupForm(email, password, { name });
+    if (formErr) {
+      toast.error(formErr);
+      return;
+    }
     try {
       const payloadRole = role;
       await apiRegister({ name, email, password, role: payloadRole });
@@ -62,8 +68,9 @@ const Register = () => {
               <Label className="text-sm text-muted-foreground">Email</Label>
               <div className="relative mt-1">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input type="email" placeholder="hello@example.com" className="border-border bg-secondary pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input type="text" inputMode="email" autoComplete="email" placeholder="user@gmail.com" maxLength={EMAIL_MAX_LENGTH} className="border-border bg-secondary pl-10" value={email} onChange={(e) => setEmail(sanitizeEmailInput(e.target.value))} />
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">{EMAIL_HINT}</p>
             </div>
             <div>
               <Label className="text-sm text-muted-foreground">Password</Label>
@@ -79,6 +86,7 @@ const Register = () => {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">{PASSWORD_HINT}</p>
             </div>
 
             <Button type="submit" className="w-full bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90" size="lg">

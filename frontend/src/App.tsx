@@ -9,6 +9,7 @@ import { useGoogleTranslate } from "@/lib/useGoogleTranslate";
 import { Suspense, lazy } from "react";
 import { Loader2 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ScrollToTop from "@/components/ScrollToTop";
 
 // Lazy load all page components for better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -182,6 +183,7 @@ const App = () => (
       <TooltipProvider>
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AuthProvider>
+            <ScrollToTop />
             <Toaster />
             <Sonner />
             <AppRoutes />

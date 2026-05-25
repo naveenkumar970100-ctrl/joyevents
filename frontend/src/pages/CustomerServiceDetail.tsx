@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Briefcase, MapPin, X, Loader2, Star, CheckCircle2, Images } from "lucide-react";
@@ -109,7 +110,7 @@ const CustomerServiceDetail = () => {
 
       const data = await apiValidatePromoCode(code.toUpperCase(), basePrice, undefined, service?._id, token || undefined);
       setAppliedPromo(data.promo);
-      toast.success(`Promo applied! You save ₹${data.discount}`);
+      toast.success(`Promo applied! You save ${formatCurrency(data.discount)}`);
     } catch (error: any) {
       setPromoError(error?.message || "Failed to apply promo code");
       setAppliedPromo(null);
@@ -219,7 +220,7 @@ const CustomerServiceDetail = () => {
                   )}
                   <h1 className="font-display text-4xl font-bold text-white leading-tight">{service.name}</h1>
                   <p className="mt-2 text-white/70 text-sm">
-                    Starting from <span className="text-white font-bold text-lg">₹{service.price}</span>
+                    Starting from <span className="text-white font-bold text-lg">{formatCurrency(service.price)}</span>
                   </p>
                 </div>
               </div>
@@ -259,7 +260,7 @@ const CustomerServiceDetail = () => {
                       {service.addOns.map((addon: any) => (
                         <div key={addon.name} className="flex items-center justify-between rounded-lg border border-border bg-card border border-border px-4 py-2.5">
                           <span className="text-sm font-medium">{addon.name}</span>
-                          <span className="text-sm font-semibold text-primary">+₹{addon.price}</span>
+                          <span className="text-sm font-semibold text-primary">+{formatCurrency(addon.price)}</span>
                         </div>
                       ))}
                     </div>
@@ -363,7 +364,7 @@ const CustomerServiceDetail = () => {
                                 </div>
                                 <span className="text-sm font-medium">{addon.name}</span>
                               </div>
-                              <span className="text-sm font-semibold text-primary">+₹{addon.price}</span>
+                              <span className="text-sm font-semibold text-primary">+{formatCurrency(addon.price)}</span>
                             </div>
                           );
                         }
@@ -376,7 +377,7 @@ const CustomerServiceDetail = () => {
                             }`}>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium">{addon.name}</p>
-                              <p className="text-xs text-primary font-semibold">₹{addon.price} per {label}</p>
+                              <p className="text-xs text-primary font-semibold">{formatCurrency(addon.price)} per {label}</p>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
                               <button disabled={qty <= 0}
@@ -462,14 +463,14 @@ const CustomerServiceDetail = () => {
                   <div className="rounded-xl bg-primary/10 border border-primary/20 p-5">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-muted-foreground">Base price</span>
-                      <span className="text-sm font-medium">₹{service.price}</span>
+                      <span className="text-sm font-medium">{formatCurrency(service.price)}</span>
                     </div>
                     {Object.keys(selectedAddOns).length > 0 && (
                       <div className="space-y-1 mb-2">
                         {(service.addOns || []).filter((a: any) => (selectedAddOns[a.name] || 0) > 0).map((a: any) => (
                           <div key={a.name} className="flex items-center justify-between">
                             <span className="text-xs text-muted-foreground">{a.name} × {selectedAddOns[a.name]} {a.guestLabel || "guests"}</span>
-                            <span className="text-xs font-medium">+₹{Number(a.price) * selectedAddOns[a.name]}</span>
+                            <span className="text-xs font-medium">+{formatCurrency(Number(a.price) * selectedAddOns[a.name])}</span>
                           </div>
                         ))}
                       </div>
@@ -478,13 +479,13 @@ const CustomerServiceDetail = () => {
                       <div className="flex items-center justify-between mb-2 text-green-600">
                         <span className="text-sm">Discount</span>
                         <span className="text-sm font-medium">
-                          -{appliedPromo.discountType === "percentage" ? `${appliedPromo.discountValue}%` : `₹${appliedPromo.discountValue}`}
+                          -{appliedPromo.discountType === "percentage" ? `${appliedPromo.discountValue}%` : `${formatCurrency(appliedPromo.discountValue)}`}
                         </span>
                       </div>
                     )}
                     <div className="border-t border-primary/20 mt-3 pt-3 flex items-center justify-between">
                       <span className="font-semibold">Total</span>
-                      <span className="font-display text-2xl font-bold text-gradient">₹{getFinalPrice()}</span>
+                      <span className="font-display text-2xl font-bold text-gradient">{formatCurrency(getFinalPrice())}</span>
                     </div>
                   </div>
                 </div>
@@ -493,7 +494,7 @@ const CustomerServiceDetail = () => {
                   className="w-full h-12 text-base bg-gradient-primary text-primary-foreground hover:opacity-90"
                   onClick={handleBookNow}
                 >
-                  Confirm Booking — ₹{getFinalPrice()}
+                  Confirm Booking — {formatCurrency(getFinalPrice())}
                 </Button>
               </div>
             </div>

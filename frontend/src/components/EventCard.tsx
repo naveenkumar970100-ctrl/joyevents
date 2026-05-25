@@ -99,9 +99,9 @@ const EventCard = ({ event, index = 0, onBookNow, onViewDetails, onImageClick, i
             {allSoldOut ? "Sold Out" : (() => {
               if (event.eventType === "ticketed" && event.tickets?.length > 0) {
                 const minPrice = Math.min(...event.tickets.map((t: any) => t.price || 0).filter((p: number) => p > 0));
-                return minPrice > 0 ? `Starts from ₹${minPrice}` : `Starts from ₹${event.price || 0}`;
+                return minPrice > 0 ? `Starts from ${formatCurrency(minPrice)}` : `Starts from ${formatCurrency(event.price || 0)}`;
               }
-              return `Starts from ₹${event.price || 0}`;
+              return `Starts from ${formatCurrency(event.price || 0)}`;
             })()}
           </span>
         </div>

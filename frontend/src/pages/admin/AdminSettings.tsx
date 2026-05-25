@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getPlatformName, setPlatformName, getSupportEmail, setSupportEmail as saveSupportEmailLocal } from "@/lib/platformName";
 import { apiSavePlatformSettings } from "@/lib/api";
 import { toast } from "sonner";
+import { sanitizeEmailInput, validateEmail, EMAIL_HINT, EMAIL_MAX_LENGTH } from "@/lib/validation";
 
 const AdminSettings = () => {
   const { user, token } = useAuth() as any;
@@ -19,6 +20,10 @@ const AdminSettings = () => {
 
   const handleSave = async () => {
     if (!platformName.trim()) { toast.error("Platform name cannot be empty"); return; }
+    if (supportEmail.trim()) {
+      const emailErr = validateEmail(supportEmail);
+      if (emailErr) { toast.error(emailErr); return; }
+    }
     try {
       await apiSavePlatformSettings({ platformName: platformName.trim(), supportEmail: supportEmail.trim() }, token);
       // Also update localStorage so current tab updates immediately
@@ -69,11 +74,15 @@ const AdminSettings = () => {
               <div>
                 <Label className="text-sm text-muted-foreground">Support Email</Label>
                 <Input
+                  type="text"
+                  inputMode="email"
+                  maxLength={EMAIL_MAX_LENGTH}
                   value={supportEmail}
-                  onChange={e => setSupportEmail(e.target.value)}
+                  onChange={e => setSupportEmail(sanitizeEmailInput(e.target.value))}
                   className="mt-1 bg-secondary border-border"
-                  placeholder="support@example.com"
+                  placeholder="support@gmail.com"
                 />
+                <p className="mt-1 text-xs text-muted-foreground">{EMAIL_HINT}</p>
               </div>
             </div>
           </motion.div>

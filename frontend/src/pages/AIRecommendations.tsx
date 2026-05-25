@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Sparkles, Calendar, MapPin, Loader2, AlertCircle, ArrowRight, Tag } from "lucide-react";
 import CustomerLayout from "@/components/CustomerLayout";
@@ -131,7 +132,7 @@ const AIRecommendations = () => {
                     )}
 
                     <div className="mt-3 flex items-center justify-between">
-                      <span className="font-bold text-sm text-gradient">₹{event.price?.toLocaleString()}</span>
+                      <span className="font-bold text-sm text-gradient">{formatCurrency(event.price)}</span>
                       <Button size="sm" className="bg-gradient-primary text-primary-foreground hover:opacity-90 h-7 px-3 text-xs"
                         onClick={() => navigate(`/customer-dashboard/events/${event._id}`)}>
                         Book <ArrowRight className="ml-1 h-3 w-3" />

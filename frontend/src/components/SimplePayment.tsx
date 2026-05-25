@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -206,12 +207,12 @@ const SimplePayment = ({ amount, bookingId, bookingData, onSuccess, onError, onC
           )}
           {bookingData.originalAmount && bookingData.discount ? (
             <div className="space-y-0.5 pt-1 border-t border-muted-foreground/20">
-              <p className="line-through text-muted-foreground">💰 ₹{bookingData.originalAmount.toLocaleString()}</p>
-              <p className="text-green-600 font-semibold">🎟️ Discount: -₹{bookingData.discount.toLocaleString()}</p>
-              <p className="text-base font-semibold text-primary">💰 ₹{amount.toLocaleString()}</p>
+              <p className="line-through text-muted-foreground">💰 {formatCurrency(bookingData.originalAmount)}</p>
+              <p className="text-green-600 font-semibold">🎟️ Discount: -{formatCurrency(bookingData.discount)}</p>
+              <p className="text-base font-semibold text-primary">💰 {formatCurrency(amount)}</p>
             </div>
           ) : (
-            <p className="text-base font-semibold text-primary">💰 ₹{amount.toLocaleString()}</p>
+            <p className="text-base font-semibold text-primary">💰 {formatCurrency(amount)}</p>
           )}
         </div>
       </div>
@@ -330,7 +331,7 @@ const SimplePayment = ({ amount, bookingId, bookingData, onSuccess, onError, onC
         {loading ? (
           <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
         ) : (
-          <>Pay {bookingData.paymentType === "advance" ? "Advance" : (bookingData.paymentType === "remaining" ? "Remaining" : "")} ₹{amount.toLocaleString()} {bookingData.paymentType === "remaining" ? "& Complete" : "& Confirm"}</>
+          <>Pay {bookingData.paymentType === "advance" ? "Advance" : (bookingData.paymentType === "remaining" ? "Remaining" : "")} {formatCurrency(amount)} {bookingData.paymentType === "remaining" ? "& Complete" : "& Confirm"}</>
         )}
       </Button>
 

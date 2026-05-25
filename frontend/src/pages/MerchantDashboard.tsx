@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { Calendar, DollarSign, Users, TrendingUp, Plus, BarChart3, CheckCircle2, Clock, AlertCircle, Loader2, History, MapPin, ExternalLink, Store, Briefcase, Settings, Video, Star, Bell, CreditCard, ArrowRight } from"lucide-react";
 import MerchantLayout from "@/components/MerchantLayout";
 import StatCard from "@/components/StatCard";
@@ -175,7 +176,7 @@ const MerchantDashboard = () => {
       }
       
       toast.success(paymentType === "advance" 
-        ? `Booking approved with advance payment of ₹${customAdvanceAmount || "30%"}!` 
+        ? `Booking approved with advance payment of ${formatCurrency(customAdvanceAmount || "30%")}!` 
         : "Booking approved with full payment requirement!");
       
       setApprovalOptions({ id: "", show: false });
@@ -290,7 +291,7 @@ const MerchantDashboard = () => {
           <div className="mt-3 sm:mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
             <StatCard title="My Events"       value={loading ? "…" : events.length}                                          icon={<Calendar className="h-5 w-5" />}      index={3} />
             <StatCard title="My Services"     value={loading ? "…" : services.length}                                        icon={<Briefcase className="h-5 w-5" />}     index={4} />
-            <StatCard title="Revenue Earned"  value={loading ? "…" : `₹${totalRevenue.toLocaleString()}`}                   icon={<DollarSign className="h-5 w-5" />}    index={5} />
+            <StatCard title="Revenue Earned"  value={loading ? "…" : `${formatCurrency(totalRevenue)}`}                   icon={<DollarSign className="h-5 w-5" />}    index={5} />
           </div>
 
           {/* Bookings Table with tabs */}
@@ -453,7 +454,7 @@ const MerchantDashboard = () => {
                             <span className="text-xs text-muted-foreground">No location provided</span>
                           )}
                         </td>
-                        <td className="px-4 py-3">₹{b.price}</td>
+                        <td className="px-4 py-3">{formatCurrency(b.price)}</td>
                         <td className="px-4 py-3 text-muted-foreground">{new Date(b.datetime).toLocaleString()}</td>
                         <td className="px-4 py-3 text-muted-foreground">
                           {b.assignedAt ? new Date(b.assignedAt).toLocaleString() : new Date(b.updatedAt).toLocaleString()}
@@ -624,7 +625,7 @@ const MerchantDashboard = () => {
                         <Calendar className="h-3 w-3" /> {new Date(event.datetime).toLocaleDateString()}
                       </p>
                       <div className="mt-2 flex items-center justify-between">
-                        <span className="text-sm font-semibold text-primary">₹{event.price}</span>
+                        <span className="text-sm font-semibold text-primary">{formatCurrency(event.price)}</span>
                         <span className={`rounded-full px-2 py-1 text-xs font-semibold capitalize ${
                           event.status === "upcoming" ? "bg-blue-500/15 text-blue-400" :
                           event.status === "ongoing" ? "bg-green-500/15 text-green-400" :
@@ -735,7 +736,7 @@ const MerchantDashboard = () => {
                           disabled={!customAdvance || Number(customAdvance) <= 0 || approving === approvalOptions.id}
                           onClick={() => handleApprove(approvalOptions.id, "advance", Number(customAdvance))}
                         >
-                          Confirm ₹{customAdvance || "0"} Advance
+                          Confirm {formatCurrency(customAdvance || "0")} Advance
                         </Button>
                       </div>
                     )}
@@ -929,7 +930,7 @@ const MerchantDashboard = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
-                <p className="font-display text-sm sm:text-2xl font-bold">₹{totalRevenue.toLocaleString()}</p>
+                <p className="font-display text-sm sm:text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
               </div>
             </div>
           </motion.div>
@@ -1088,17 +1089,19 @@ const MerchantDashboard = () => {
                   </div>
                   <div className="p-2 sm:p-2 sm:p-4 rounded-lg bg-green-500/10 border border-green-500/20">
                     <p className="text-sm text-muted-foreground mb-2">Total Revenue (95%)</p>
-                    <p className="text-xs sm:text-3xl font-bold text-green-600">₹{Math.round(totalRevenue * 0.95).toLocaleString()}</p>
+                    <p className="text-xs sm:text-3xl font-bold text-green-600">{formatCurrency(Math.round(totalRevenue * 0.95))}</p>
                   </div>
                   <div className="p-2 sm:p-2 sm:p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
                     <p className="text-sm text-muted-foreground mb-2">Pending Payout</p>
                     <p className="text-xs sm:text-3xl font-bold text-purple-600">
-                      {revenueBookings.filter(b => !b.payoutProcessed).length > 0
-                        ? "₹" + Math.round(revenueBookings.filter(b => !b.payoutProcessed).reduce((sum, b) => {
-                            const amt = (b.paymentStatus === "partially_paid" && b.isAdvancePaid) ? (b.advanceAmount || 0) : (b.price || 0);
-                            return sum + (amt * 0.95);
-                          }, 0)).toLocaleString()
-                        : "₹0"}
+                      {formatCurrency(
+                        revenueBookings.filter(b => !b.payoutProcessed).length > 0
+                          ? Math.round(revenueBookings.filter(b => !b.payoutProcessed).reduce((sum, b) => {
+                              const amt = (b.paymentStatus === "partially_paid" && b.isAdvancePaid) ? (b.advanceAmount || 0) : (b.price || 0);
+                              return sum + (amt * 0.95);
+                            }, 0))
+                          : 0
+                      )}
                     </p>
                   </div>
                 </div>
@@ -1114,7 +1117,7 @@ const MerchantDashboard = () => {
                           <div className="flex-1">
                             <p className="font-medium text-sm">{booking.serviceName || booking.event?.title}</p>
                             <p className="text-xs text-muted-foreground">
-                              ₹{paidAmt} paid → 95% = ₹{Math.round(paidAmt * 0.95).toLocaleString()}
+                              {formatCurrency(paidAmt)} paid → 95% = {formatCurrency(Math.round(paidAmt * 0.95))}
                               {booking.paymentStatus === "partially_paid" && <span className="ml-1 text-orange-400">(advance)</span>}
                             </p>
                           </div>

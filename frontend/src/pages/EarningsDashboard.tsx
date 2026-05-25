@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { DollarSign, TrendingUp, Wallet, History, ArrowDownRight, ArrowUpRight, Loader2, AlertCircle, CheckCircle2, Clock, XCircle } from "lucide-react";
 import MerchantLayout from "@/components/MerchantLayout";
@@ -183,26 +184,26 @@ const EarningsDashboard = () => {
         >
           <StatCard
             title="Total Earnings"
-            value={`₹${earnings?.totalEarnings?.toLocaleString() || "0"}`}
+            value={formatCurrency(earnings?.totalEarnings || 0)}
             icon={TrendingUp}
             color="text-green-600"
             trend="+12.5%"
           />
           <StatCard
             title="Commission Deducted"
-            value={`₹${earnings?.totalCommission?.toLocaleString() || "0"}`}
+            value={formatCurrency(earnings?.totalCommission || 0)}
             icon={ArrowDownRight}
             color="text-red-600"
           />
           <StatCard
             title="Total Withdrawn"
-            value={`₹${earnings?.totalWithdrawn?.toLocaleString() || "0"}`}
+            value={formatCurrency(earnings?.totalWithdrawn || 0)}
             icon={Wallet}
             color="text-blue-600"
           />
           <StatCard
             title="Available Balance"
-            value={`₹${earnings?.availableBalance?.toLocaleString() || "0"}`}
+            value={formatCurrency(earnings?.availableBalance || 0)}
             icon={DollarSign}
             color="text-purple-600"
           />
@@ -225,7 +226,7 @@ const EarningsDashboard = () => {
           </div>
           <div className="rounded-xl border border-border bg-card p-3 sm:p-6">
             <p className="text-sm text-muted-foreground mb-2">Pending Amount</p>
-            <p className="text-xs sm:text-3xl font-bold text-orange-600">₹{earnings?.pendingWithdrawalAmount?.toLocaleString() || "0"}</p>
+            <p className="text-xs sm:text-3xl font-bold text-orange-600">{formatCurrency(earnings?.pendingWithdrawalAmount || 0)}</p>
           </div>
         </motion.div>
 
@@ -268,7 +269,7 @@ const EarningsDashboard = () => {
                   {withdrawals.map((withdrawal) => (
                     <div key={withdrawal._id} className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors">
                       <div className="flex-1">
-                        <p className="font-medium">₹{withdrawal.amount.toLocaleString()}</p>
+                        <p className="font-medium">{formatCurrency(withdrawal.amount)}</p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {withdrawal.bankDetails?.bankName} - {withdrawal.bankDetails?.accountNumber?.slice(-4)}
                         </p>
@@ -344,7 +345,7 @@ const EarningsDashboard = () => {
                       <div className="flex items-center gap-4">
                         <div className="text-right">
                           <p className={`font-semibold ${transaction.type === "earning" ? "text-green-600" : "text-red-600"}`}>
-                            {transaction.type === "earning" ? "+" : "-"}₹{transaction.amount.toLocaleString()}
+                            {transaction.type === "earning" ? "+" : "-"}{formatCurrency(transaction.amount)}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
                             {new Date(transaction.createdAt).toLocaleDateString()}
@@ -390,7 +391,7 @@ const EarningsDashboard = () => {
               <div>
                 <Label>Withdrawal Amount</Label>
                 <div className="mt-2 p-3 rounded-lg bg-secondary">
-                  <p className="text-sm text-muted-foreground">Available Balance: ₹{earnings?.availableBalance?.toLocaleString() || "0"}</p>
+                  <p className="text-sm text-muted-foreground">Available Balance: {formatCurrency(earnings?.availableBalance || 0)}</p>
                 </div>
                 <Input
                   type="number"

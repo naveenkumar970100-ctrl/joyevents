@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { Briefcase, Trash2, Pencil, Plus, ImageIcon, Loader2, AlertCircle, X, Tag, Upload } from "lucide-react";
 import MerchantLayout from "@/components/MerchantLayout";
 import { Input } from "@/components/ui/input";
@@ -383,7 +384,7 @@ const MerchantServices = () => {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <span className="absolute bottom-3 left-3 rounded-full bg-gradient-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                      From ₹{svc.price}
+                      From {formatCurrency(svc.price)}
                     </span>
                     <span className={`absolute top-3 right-3 rounded-full px-2 py-0.5 text-xs font-semibold ${svc.active !== false ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}>
                       {svc.active !== false ? "Active" : "Inactive"}

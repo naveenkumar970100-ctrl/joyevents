@@ -12,6 +12,7 @@ import { dashboardPaths, roleLabels } from "@/lib/auth";
 import { apiLogin } from "@/lib/api";
 import { Link } from "react-router-dom";
 import { setSessionActive } from "@/lib/session";
+import { sanitizeEmailInput, validateLoginForm, EMAIL_HINT, EMAIL_MAX_LENGTH } from "@/lib/validation";
 
 const Login = () => {
   const { role, setRole, setIsLoggedIn, setToken, setUser, isLoggedIn } = useAuth();
@@ -45,6 +46,11 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const formErr = validateLoginForm(email, password);
+    if (formErr) {
+      toast.error(formErr);
+      return;
+    }
     try {
       const res = await apiLogin({ email, password });
       const userRole = res?.user?.role === "user" ? "customer" : res?.user?.role;
@@ -102,8 +108,9 @@ const Login = () => {
               <Label className="text-sm text-muted-foreground">Email</Label>
               <div className="relative mt-1">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input type="email" placeholder="hello@example.com" className="border-border bg-secondary pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input type="text" inputMode="email" autoComplete="email" placeholder="user@gmail.com" maxLength={EMAIL_MAX_LENGTH} className="border-border bg-secondary pl-10" value={email} onChange={(e) => setEmail(sanitizeEmailInput(e.target.value))} />
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">{EMAIL_HINT}</p>
             </div>
             <div>
               <Label className="text-sm text-muted-foreground">Password</Label>

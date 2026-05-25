@@ -4,6 +4,7 @@ import User from "../models/User.js";
 import Withdrawal from "../models/Withdrawal.js";
 import Transaction from "../models/Transaction.js";
 import { verifyToken, requireRole } from "../middleware/auth.js";
+import { formatCurrency } from "../utils/formatCurrency.js";
 
 const router = Router();
 
@@ -142,7 +143,7 @@ router.post("/withdrawal-request", verifyToken, async (req, res) => {
       merchant: merchantId,
       type: "withdrawal",
       amount,
-      description: `Withdrawal request for ₹${amount}`,
+      description: `Withdrawal request for ${formatCurrency(amount)}`,
       status: "pending",
       relatedId: withdrawal._id.toString()
     });
@@ -204,7 +205,7 @@ router.patch("/withdrawal/:id/approve", verifyToken, requireRole("admin"), async
     await Notification.create({
       userId: withdrawal.merchant._id,
       title: "Withdrawal Approved",
-      message: `Your withdrawal request of ₹${withdrawal.amount} has been approved by admin.`,
+      message: `Your withdrawal request of ${formatCurrency(withdrawal.amount)} has been approved by admin.`,
       type: "booking",
       status: "unread",
       relatedId: withdrawal._id,
@@ -244,7 +245,7 @@ router.patch("/withdrawal/:id/complete", verifyToken, requireRole("admin"), asyn
     await Notification.create({
       userId: withdrawal.merchant._id,
       title: "Withdrawal Completed",
-      message: `Your withdrawal of ₹${withdrawal.amount} has been successfully completed. Transaction ID: ${transactionId}`,
+      message: `Your withdrawal of ${formatCurrency(withdrawal.amount)} has been successfully completed. Transaction ID: ${transactionId}`,
       type: "booking",
       status: "unread",
       relatedId: withdrawal._id,
@@ -284,7 +285,7 @@ router.patch("/withdrawal/:id/reject", verifyToken, requireRole("admin"), async 
     await Notification.create({
       userId: withdrawal.merchant._id,
       title: "Withdrawal Rejected",
-      message: `Your withdrawal request of ₹${withdrawal.amount} has been rejected. Reason: ${reason}`,
+      message: `Your withdrawal request of ${formatCurrency(withdrawal.amount)} has been rejected. Reason: ${reason}`,
       type: "booking",
       status: "unread",
       relatedId: withdrawal._id,

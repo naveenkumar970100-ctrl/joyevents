@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { DollarSign, TrendingUp, Users, CreditCard, ArrowUpRight, ArrowDownRight, RefreshCcw, Wallet, CheckCircle2, Loader2, AlertCircle, Check, X } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
@@ -266,7 +267,7 @@ const PaymentManagement = () => {
         }
       }));
       
-      toast.success(`Payout of ₹${payout.netPayout.toLocaleString()} processed for ${payout.merchant.name}`);
+      toast.success(`Payout of ${formatCurrency(payout.netPayout)} processed for ${payout.merchant.name}`);
       
       // Reload transactions to update the table
       loadTransactions();
@@ -396,7 +397,7 @@ const PaymentManagement = () => {
               </div>
               <h4 className="font-semibold text-sm mb-2">Commission Calculation</h4>
               <p className="text-xs text-muted-foreground mb-3">Track admin commission on all transactions</p>
-              <p className="text-lg font-bold text-green-600">₹{totalCommission.toLocaleString()}</p>
+              <p className="text-lg font-bold text-green-600">{formatCurrency(totalCommission)}</p>
               <p className="text-xs text-muted-foreground">Total Commission</p>
             </div>
 
@@ -449,15 +450,15 @@ const PaymentManagement = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
               <p className="text-sm text-muted-foreground mb-2">User Ticket Price</p>
-              <p className="text-sm sm:text-2xl font-bold text-blue-600">₹1000</p>
+              <p className="text-sm sm:text-2xl font-bold text-blue-600">{formatCurrency(1000)}</p>
             </div>
             <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
               <p className="text-sm text-muted-foreground mb-2">Admin Commission (5%)</p>
-              <p className="text-sm sm:text-2xl font-bold text-green-600">₹50</p>
+              <p className="text-sm sm:text-2xl font-bold text-green-600">{formatCurrency(50)}</p>
             </div>
             <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
               <p className="text-sm text-muted-foreground mb-2">Merchant Receives (95%)</p>
-              <p className="text-sm sm:text-2xl font-bold text-purple-600">₹950</p>
+              <p className="text-sm sm:text-2xl font-bold text-purple-600">{formatCurrency(950)}</p>
             </div>
           </div>
         </motion.div>
@@ -471,14 +472,14 @@ const PaymentManagement = () => {
         >
           <StatCard
             title="Total Revenue"
-            value={`₹${totalRevenue.toLocaleString()}`}
+            value={`${formatCurrency(totalRevenue)}`}
             icon={TrendingUp}
             trend="+12.5%"
             color="text-green-600"
           />
           <StatCard
             title="Admin Commission (5%)"
-            value={`₹${totalCommission.toLocaleString()}`}
+            value={`${formatCurrency(totalCommission)}`}
             icon={DollarSign}
             trend="+8.2%"
             color="text-blue-600"
@@ -584,7 +585,7 @@ const PaymentManagement = () => {
                             </div>
                           </TableCell>
                           <TableCell className="font-semibold">
-                            ₹{booking.price.toLocaleString()}
+                            {formatCurrency(booking.price)}
                           </TableCell>
                           <TableCell>
                             <Badge
@@ -661,12 +662,12 @@ const PaymentManagement = () => {
                               {booking.event && <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-500/15 text-purple-400">Event</span>}
                             </div>
                           </TableCell>
-                          <TableCell>₹{booking.price.toLocaleString()}</TableCell>
+                          <TableCell>{formatCurrency(booking.price)}</TableCell>
                           <TableCell className="text-green-600 font-semibold">
-                            ₹{(booking.price * COMMISSION_RATE).toLocaleString()}
+                            {formatCurrency((booking.price * COMMISSION_RATE))}
                           </TableCell>
                           <TableCell className="text-blue-600 font-semibold">
-                            ₹{(booking.price * (1 - COMMISSION_RATE)).toLocaleString()}
+                            {formatCurrency((booking.price * (1 - COMMISSION_RATE)))}
                           </TableCell>
                           <TableCell className="text-sm">
                             {new Date(booking.datetime).toLocaleDateString()}
@@ -728,7 +729,7 @@ const PaymentManagement = () => {
                               </div>
                             </TableCell>
                             <TableCell className="font-semibold text-red-600">
-                              -₹{booking.price.toLocaleString()}
+                              -{formatCurrency(booking.price)}
                             </TableCell>
                             <TableCell>
                               <Badge variant="secondary">Refunded</Badge>
@@ -784,13 +785,13 @@ const PaymentManagement = () => {
                           </TableCell>
                           <TableCell className="font-semibold">{payout.bookings.length}</TableCell>
                           <TableCell className="font-semibold">
-                            ₹{payout.totalRevenue.toLocaleString()}
+                            {formatCurrency(payout.totalRevenue)}
                           </TableCell>
                           <TableCell className="text-green-600 font-semibold">
-                            ₹{payout.totalCommission.toLocaleString()}
+                            {formatCurrency(payout.totalCommission)}
                           </TableCell>
                           <TableCell className="text-blue-600 font-semibold text-lg">
-                            ₹{payout.netPayout.toLocaleString()}
+                            {formatCurrency(payout.netPayout)}
                           </TableCell>
                           <TableCell>
                             {processedPayouts.has(payout.merchant._id) ? (
@@ -858,7 +859,7 @@ const PaymentManagement = () => {
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
                             <div className="p-2 rounded bg-secondary/50">
                               <p className="text-xs text-muted-foreground">Amount</p>
-                              <p className="font-semibold text-orange-600">₹{withdrawal.amount.toLocaleString()}</p>
+                              <p className="font-semibold text-orange-600">{formatCurrency(withdrawal.amount)}</p>
                             </div>
                             <div className="p-2 rounded bg-secondary/50">
                               <p className="text-xs text-muted-foreground">Requested</p>
@@ -930,19 +931,19 @@ const PaymentManagement = () => {
                       <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
                         <p className="text-sm text-muted-foreground">Total Revenue</p>
                         <p className="text-sm sm:text-2xl font-bold text-blue-600 mt-2">
-                          ₹{merchantPayouts.reduce((sum, p) => sum + p.totalRevenue, 0).toLocaleString()}
+                          {formatCurrency(merchantPayouts.reduce((sum, p) => sum + p.totalRevenue, 0))}
                         </p>
                       </div>
                       <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
                         <p className="text-sm text-muted-foreground">Total Admin Commission</p>
                         <p className="text-sm sm:text-2xl font-bold text-green-600 mt-2">
-                          ₹{merchantPayouts.reduce((sum, p) => sum + p.totalCommission, 0).toLocaleString()}
+                          {formatCurrency(merchantPayouts.reduce((sum, p) => sum + p.totalCommission, 0))}
                         </p>
                       </div>
                       <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
                         <p className="text-sm text-muted-foreground">Total Merchant Payouts</p>
                         <p className="text-sm sm:text-2xl font-bold text-purple-600 mt-2">
-                          ₹{merchantPayouts.reduce((sum, p) => sum + p.netPayout, 0).toLocaleString()}
+                          {formatCurrency(merchantPayouts.reduce((sum, p) => sum + p.netPayout, 0))}
                         </p>
                       </div>
                     </div>
@@ -967,10 +968,10 @@ const PaymentManagement = () => {
                               {merchantPayouts.filter(p => !processedPayouts.has(p.merchant._id)).length} merchant(s) waiting for payout approval
                             </p>
                             <p className="text-lg font-bold text-orange-600 mt-2">
-                              ₹{merchantPayouts
+                              {formatCurrency(merchantPayouts
                                 .filter(p => !processedPayouts.has(p.merchant._id))
                                 .reduce((sum, p) => sum + p.netPayout, 0)
-                                .toLocaleString()}
+                                )}
                             </p>
                           </div>
                           <Button
@@ -995,10 +996,10 @@ const PaymentManagement = () => {
                                 {merchantPayouts.filter(p => processedPayouts.has(p.merchant._id)).length} merchant(s) payout(s) approved
                               </p>
                               <p className="text-lg font-bold text-green-600 mt-2">
-                                ₹{merchantPayouts
+                                {formatCurrency(merchantPayouts
                                   .filter(p => processedPayouts.has(p.merchant._id))
                                   .reduce((sum, p) => sum + p.netPayout, 0)
-                                  .toLocaleString()}
+                                  )}
                               </p>
                             </div>
                             <CheckCircle2 className="h-8 w-8 text-green-600" />
@@ -1110,7 +1111,7 @@ const PaymentManagement = () => {
                                 <p className="text-xs text-muted-foreground">{withdrawal.merchant?.email}</p>
                               </div>
                             </TableCell>
-                            <TableCell className="font-semibold">₹{withdrawal.amount.toLocaleString()}</TableCell>
+                            <TableCell className="font-semibold">{formatCurrency(withdrawal.amount)}</TableCell>
                             <TableCell className="text-sm">
                               <div className="space-y-1">
                                 <p>{withdrawal.bankDetails?.accountHolder}</p>
@@ -1225,7 +1226,7 @@ const PaymentManagement = () => {
                     <strong>Customer:</strong> {selectedBooking?.customer?.name}
                   </div>
                   <div className="text-sm">
-                    <strong>Amount:</strong> ₹{selectedBooking?.price.toLocaleString()}
+                    <strong>Amount:</strong> {formatCurrency(selectedBooking?.price)}
                   </div>
                 </div>
               </div>
@@ -1266,7 +1267,7 @@ const PaymentManagement = () => {
                   <strong>Merchant:</strong> {selectedWithdrawal?.merchant?.name}
                 </div>
                 <div className="text-sm">
-                  <strong>Amount:</strong> ₹{selectedWithdrawal?.amount.toLocaleString()}
+                  <strong>Amount:</strong> {formatCurrency(selectedWithdrawal?.amount)}
                 </div>
                 <div className="text-sm">
                   <strong>Account:</strong> {selectedWithdrawal?.bankDetails?.accountNumber}
@@ -1303,7 +1304,7 @@ const PaymentManagement = () => {
                   <strong>Merchant:</strong> {selectedWithdrawal?.merchant?.name}
                 </div>
                 <div className="text-sm">
-                  <strong>Amount:</strong> ₹{selectedWithdrawal?.amount.toLocaleString()}
+                  <strong>Amount:</strong> {formatCurrency(selectedWithdrawal?.amount)}
                 </div>
               </div>
               <div>
@@ -1347,7 +1348,7 @@ const PaymentManagement = () => {
                   <strong>Merchant:</strong> {selectedWithdrawal?.merchant?.name}
                 </div>
                 <div className="text-sm">
-                  <strong>Amount:</strong> ₹{selectedWithdrawal?.amount.toLocaleString()}
+                  <strong>Amount:</strong> {formatCurrency(selectedWithdrawal?.amount)}
                 </div>
               </div>
               <div>
@@ -1396,10 +1397,10 @@ const PaymentManagement = () => {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Total amount:</span>
                     <span className="font-semibold text-orange-600">
-                      ₹{merchantPayouts
+                      {formatCurrency(merchantPayouts
                         .filter(p => !processedPayouts.has(p.merchant._id))
                         .reduce((sum, p) => sum + p.netPayout, 0)
-                        .toLocaleString()}
+                        )}
                     </span>
                   </div>
                 </div>

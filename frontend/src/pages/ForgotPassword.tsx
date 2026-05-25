@@ -8,6 +8,7 @@ import Layout from "@/components/Layout";
 import { toast } from "sonner";
 import { Mail, ArrowRight, CheckCircle } from "lucide-react";
 import { apiForgotPassword } from "@/lib/api";
+import { sanitizeEmailInput, validateEmail, EMAIL_HINT, EMAIL_MAX_LENGTH } from "@/lib/validation";
 
 const ForgotPassword = () => {
   const location = useLocation();
@@ -20,8 +21,9 @@ const ForgotPassword = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) {
-      toast.error("Please enter your email");
+    const emailErr = validateEmail(email);
+    if (emailErr) {
+      toast.error(emailErr);
       return;
     }
     setLoading(true);
@@ -53,7 +55,8 @@ const ForgotPassword = () => {
               </div>
               <h2 className="font-display text-2xl font-bold">Check Your Email</h2>
               <p className="text-sm text-muted-foreground">
-                If the email exists, we sent a password reset link. Open the link to set a new password.
+                If an account exists for <strong>{email}</strong>, we sent a password reset link.
+                Check your inbox and spam folder.
               </p>
               <Link to={loginHref}>
                 <Button className="bg-gradient-primary text-primary-foreground hover:opacity-90">
@@ -74,14 +77,18 @@ const ForgotPassword = () => {
                   <div className="relative mt-1">
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
-                      type="email"
-                      placeholder="hello@example.com"
+                      type="text"
+                      inputMode="email"
+                      autoComplete="email"
+                      placeholder="user@gmail.com"
+                      maxLength={EMAIL_MAX_LENGTH}
                       className="border-border bg-secondary pl-10"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => setEmail(sanitizeEmailInput(e.target.value))}
                       required
                     />
                   </div>
+                  <p className="mt-1 text-xs text-muted-foreground">{EMAIL_HINT}</p>
                 </div>
 
                 <Button
@@ -110,5 +117,3 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
-
-

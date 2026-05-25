@@ -1,4 +1,11 @@
 import { API_URL } from "./config";
+import {
+  validateEmail,
+  normalizeEmail,
+  validateLoginForm,
+  validateSignupForm,
+  validateNewPasswordForm,
+} from "./validation";
 
 // Helper: build a URL that works whether API_URL is absolute ("https://example.com")
 // or empty string (Docker/Nginx — relative paths, same origin).
@@ -8,11 +15,13 @@ function buildUrl(path: string): URL {
 }
 
 export async function apiRegister(params: { name: string; email: string; password: string; role: "customer" | "merchant" | "admin" }) {
+  const err = validateSignupForm(params.email, params.password, { name: params.name });
+  if (err) throw new Error(err);
   const role = params.role === "customer" ? "user" : params.role;
   const res = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: params.name, email: params.email, password: params.password, role })
+    body: JSON.stringify({ name: params.name, email: normalizeEmail(params.email), password: params.password, role })
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -22,10 +31,12 @@ export async function apiRegister(params: { name: string; email: string; passwor
 }
 
 export async function apiCreateUser(params: { name: string; email: string; password: string; role?: string }, token: string) {
+  const err = validateSignupForm(params.email, params.password, { name: params.name });
+  if (err) throw new Error(err);
   const res = await fetch(`${API_URL}/api/auth/users`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify(params)
+    body: JSON.stringify({ ...params, email: normalizeEmail(params.email) })
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -35,10 +46,12 @@ export async function apiCreateUser(params: { name: string; email: string; passw
 }
 
 export async function apiLogin(params: { email: string; password: string }) {
+  const err = validateLoginForm(params.email, params.password);
+  if (err) throw new Error(err);
   const res = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: params.email, password: params.password })
+    body: JSON.stringify({ email: normalizeEmail(params.email), password: params.password })
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -347,6 +360,11 @@ export async function apiListUsers(token: string) {
 }
 
 export async function apiUpdateUser(id: string, payload: Partial<{ name: string; email: string; role: string }>, token: string) {
+  if (payload.email !== undefined) {
+    const emailErr = validateEmail(payload.email);
+    if (emailErr) throw new Error(emailErr);
+    payload = { ...payload, email: normalizeEmail(payload.email) };
+  }
   const res = await fetch(`${API_URL}/api/auth/users/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -371,6 +389,8 @@ export async function apiBookingHistory(token: string) {
 }
 
 export async function apiChangePassword(params: { currentPassword: string; newPassword: string }, token: string) {
+  const pwdErr = validateNewPasswordForm(params.newPassword);
+  if (pwdErr) throw new Error(pwdErr);
   const res = await fetch(`${API_URL}/api/auth/change-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -646,6 +666,8 @@ export async function apiDeleteUser(id: string, token: string) {
 
 // Admin: Reset password for any user
 export async function apiResetPassword(userId: string, newPassword: string, token: string) {
+  const pwdErr = validateNewPasswordForm(newPassword);
+  if (pwdErr) throw new Error(pwdErr);
   const res = await fetch(`${API_URL}/api/auth/admin/reset-password/${userId}`, {
     method: "PATCH",
     headers: {
@@ -1048,10 +1070,17 @@ export async function apiGetPlatformSettings() {
 }
 
 export async function apiSavePlatformSettings(data: { platformName: string; supportEmail: string }, token: string) {
+  if (data.supportEmail?.trim()) {
+    const emailErr = validateEmail(data.supportEmail);
+    if (emailErr) throw new Error(emailErr);
+  }
   const res = await fetch(`${API_URL}/api/settings/platform`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      ...data,
+      supportEmail: data.supportEmail?.trim() ? normalizeEmail(data.supportEmail) : "",
+    }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -1063,10 +1092,12 @@ export async function apiSavePlatformSettings(data: { platformName: string; supp
 // ── Password Reset ───────────────────────────────────────────────────────────
 
 export async function apiForgotPassword(email: string, redirect?: string) {
+  const emailErr = validateEmail(email);
+  if (emailErr) throw new Error(emailErr);
   const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, redirect }),
+    body: JSON.stringify({ email: normalizeEmail(email), redirect }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -1076,6 +1107,8 @@ export async function apiForgotPassword(email: string, redirect?: string) {
 }
 
 export async function apiResetPasswordWithToken(token: string, newPassword: string) {
+  const pwdErr = validateNewPasswordForm(newPassword);
+  if (pwdErr) throw new Error(pwdErr);
   const res = await fetch(`${API_URL}/api/auth/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

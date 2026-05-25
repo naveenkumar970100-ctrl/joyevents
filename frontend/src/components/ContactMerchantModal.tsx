@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { API_URL } from "@/lib/config";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { sanitizeEmailInput, validateEmail, EMAIL_HINT, EMAIL_MAX_LENGTH } from "@/lib/validation";
 
 interface Props {
   itemTitle: string;
@@ -28,6 +29,11 @@ const ContactMerchantModal = ({ itemTitle, eventId, serviceId, merchantId, onClo
     e.preventDefault();
     if (!name.trim() || !email.trim() || !message.trim()) {
       toast.error("Please fill in all fields");
+      return;
+    }
+    const emailErr = validateEmail(email);
+    if (emailErr) {
+      toast.error(emailErr);
       return;
     }
     setLoading(true);
@@ -87,7 +93,8 @@ const ContactMerchantModal = ({ itemTitle, eventId, serviceId, merchantId, onClo
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">Your Email</Label>
-                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" className="mt-1" required />
+                <Input type="text" inputMode="email" maxLength={EMAIL_MAX_LENGTH} value={email} onChange={e => setEmail(sanitizeEmailInput(e.target.value))} placeholder="user@gmail.com" className="mt-1" required />
+                <p className="mt-1 text-xs text-muted-foreground">{EMAIL_HINT}</p>
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">Message</Label>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Megaphone, Ticket, Share2, Send, Plus, Edit2, Trash2, Copy, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import MerchantLayout from "@/components/MerchantLayout";
@@ -369,10 +370,10 @@ const MarketingTools = () => {
                           </div>
                           <p className="text-sm text-muted-foreground">{promo.description}</p>
                           <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
-                            <span>{promo.discountType === "percentage" ? `${promo.discountValue}%` : `₹${promo.discountValue}`} off</span>
+                            <span>{promo.discountType === "percentage" ? `${promo.discountValue}%` : `${formatCurrency(promo.discountValue)}`} off</span>
                             <span>Used: {promo.currentUses}/{promo.maxUses || "∞"}</span>
                             {promo.minBookingAmount > 0 && (
-                              <span>Min. ₹{promo.minBookingAmount}</span>
+                              <span>Min. {formatCurrency(promo.minBookingAmount)}</span>
                             )}
                             {promo.applicableCategories && promo.applicableCategories.length > 0 && promo.applicableCategories[0] !== "all" && (
                               <span className="capitalize">Cat: {promo.applicableCategories[0]}</span>

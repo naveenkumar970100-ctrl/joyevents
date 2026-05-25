@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { ArrowLeft, AlertCircle, Loader2, Ticket, Clock, MapPin, User, Calendar as CalendarIcon } from "lucide-react";
 import CustomerLayout from "@/components/CustomerLayout";
 import { Button } from "@/components/ui/button";
@@ -190,7 +191,7 @@ const UpcomingBookings = () => {
                       <div className="pt-3 border-t border-border">
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-muted-foreground">Price Paid</span>
-                          <span className="font-semibold text-primary">₹{booking.price}</span>
+                          <span className="font-semibold text-primary">{formatCurrency(booking.price)}</span>
                         </div>
                       </div>
 

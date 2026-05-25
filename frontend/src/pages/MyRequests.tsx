@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { ArrowLeft, Ticket, AlertCircle, Star, X, FileText, CreditCard } from "lucide-react";
 import QRCode from "qrcode";
 import CustomerLayout from "@/components/CustomerLayout";
@@ -143,10 +144,10 @@ const MyRequests = () => {
     if (b.paymentType === "advance") {
       if (b.isRemainingPaid) {
         total = b.price; // fully paid
-        paidNote = `Full payment (Advance ₹${b.advanceAmount} + Remaining ₹${b.remainingAmount})`;
+        paidNote = `Full payment (Advance ${formatCurrency(b.advanceAmount)} + Remaining ${formatCurrency(b.remainingAmount)})`;
       } else if (b.isAdvancePaid) {
         total = b.advanceAmount || b.price; // only advance paid
-        paidNote = `Advance payment only (Remaining ₹${b.remainingAmount} due)`;
+        paidNote = `Advance payment only (Remaining ${formatCurrency(b.remainingAmount)} due)`;
       } else {
         total = b.price;
       }
@@ -166,8 +167,8 @@ const MyRequests = () => {
       <tr style="${i % 2 === 0 ? "background:#fafafa;" : ""}">
         <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;${l.desc.startsWith("  ↳") ? "color:#7c3aed;font-style:italic;padding-left:28px;" : "font-weight:500;"}">${l.desc.replace("  ↳", "↳")}</td>
         <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;text-align:center;">${l.qty}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;text-align:right;">₹${l.unit.toFixed(2)}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;text-align:right;font-weight:600;">₹${(l.qty * l.unit).toFixed(2)}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;text-align:right;">${formatCurrency(l.unit, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #f0f0f0;text-align:right;font-weight:600;">${formatCurrency((l.qty * l.unit), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       </tr>`).join("");
 
     const html = `<!DOCTYPE html>
@@ -268,16 +269,16 @@ const MyRequests = () => {
     </table>
 
     <div class="totals">
-      <div class="totals-row"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
-      ${addOnTotal > 0 ? `<div class="totals-row addon"><span>Add-ons Total</span><span>+₹${addOnTotal.toFixed(2)}</span></div>` : ""}
-      ${discount > 0 ? `<div class="totals-row discount"><span>Promo Discount${b.promoCode?.code ? ` (${b.promoCode.code})` : ""}</span><span>−₹${discount.toFixed(2)}</span></div>` : ""}
-      <div class="totals-row total"><span>Total Paid</span><span>₹${total.toFixed(2)}</span></div>
+      <div class="totals-row"><span>Subtotal</span><span>${formatCurrency(subtotal, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+      ${addOnTotal > 0 ? `<div class="totals-row addon"><span>Add-ons Total</span><span>+${formatCurrency(addOnTotal, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>` : ""}
+      ${discount > 0 ? `<div class="totals-row discount"><span>Promo Discount${b.promoCode?.code ? ` (${b.promoCode.code})` : ""}</span><span>−${formatCurrency(discount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>` : ""}
+      <div class="totals-row total"><span>Total Paid</span><span>${formatCurrency(total, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
     </div>
 
     <div class="payment-box">
       <div><div class="label">Payment Reference</div><div class="value">${paymentId}</div></div>
       <div><div class="label">Payment Status</div><div class="value" style="color:#10b981;">✓ Paid</div></div>
-      <div><div class="label">Amount Paid</div><div class="value" style="color:#7c3aed;font-size:16px;font-weight:800;">₹${total.toFixed(2)}</div></div>
+      <div><div class="label">Amount Paid</div><div class="value" style="color:#7c3aed;font-size:16px;font-weight:800;">${formatCurrency(total, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
     </div>
     ${paidNote ? `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 16px;margin-top:12px;font-size:12px;color:#92400e;">ℹ️ ${paidNote}</div>` : ""}
 
@@ -360,16 +361,16 @@ const MyRequests = () => {
                           )}
                         </td>
                         <td className="px-4 py-3">
-                          <div>₹{b.price}</div>
+                          <div>{formatCurrency(b.price)}</div>
                           {b.paymentType === "advance" && (
                             <div className="mt-1 space-y-0.5">
                               {b.isAdvancePaid ? (
-                                <div className="text-xs text-emerald-400">✓ Advance paid: ₹{b.advanceAmount}</div>
+                                <div className="text-xs text-emerald-400">✓ Advance paid: {formatCurrency(b.advanceAmount)}</div>
                               ) : (
-                                <div className="text-xs text-orange-400">Advance due: ₹{b.advanceAmount}</div>
+                                <div className="text-xs text-orange-400">Advance due: {formatCurrency(b.advanceAmount)}</div>
                               )}
                               {b.isAdvancePaid && !b.isRemainingPaid && (
-                                <div className="text-xs text-pink-400">Remaining: ₹{b.remainingAmount}</div>
+                                <div className="text-xs text-pink-400">Remaining: {formatCurrency(b.remainingAmount)}</div>
                               )}
                               {b.isRemainingPaid && (
                                 <div className="text-xs text-emerald-400">✓ Fully paid</div>
@@ -620,7 +621,7 @@ const MyRequests = () => {
       
       <div class="detail-row">
         <span class="detail-label">💰 Price Paid</span>
-        <span class="detail-value">₹${b.price}</span>
+        <span class="detail-value">${formatCurrency(b.price)}</span>
       </div>
       
       ${seatNumbers.length > 0 ? `
@@ -715,14 +716,14 @@ const MyRequests = () => {
                             {b.status === "awaiting_payment" && (
                               <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white font-bold gap-1" onClick={() => openPaymentModal(b)}>
                                 <CreditCard className="h-3.5 w-3.5" />
-                                {b.paymentType === "advance" ? `Pay ₹${b.advanceAmount}` : "Pay Now"}
+                                {b.paymentType === "advance" ? `Pay ${formatCurrency(b.advanceAmount)}` : "Pay Now"}
                               </Button>
                             )}
 
                             {/* 6. Pay Remaining */}
                             {b.status === "awaiting_final_payment" && (
                               <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white font-bold gap-1" onClick={() => openPaymentModal(b)}>
-                                <CreditCard className="h-3.5 w-3.5" /> Pay ₹{b.remainingAmount}
+                                <CreditCard className="h-3.5 w-3.5" /> Pay {formatCurrency(b.remainingAmount)}
                               </Button>
                             )}
                           </div>

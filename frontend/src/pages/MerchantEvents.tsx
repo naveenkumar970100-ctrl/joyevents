@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { Calendar, Trash2, Pencil, Plus, ImageIcon, Loader2, AlertCircle, X, Clock, MapPin, DollarSign, Upload, Ticket } from "lucide-react";
 import MerchantLayout from "@/components/MerchantLayout";
 import { Input } from "@/components/ui/input";
@@ -376,9 +377,9 @@ const MerchantEvents = () => {
                             } else { (ev.tickets || []).forEach((t: any) => { if (t.price > 0) allPrices.push(t.price); }); }
                             if (!allPrices.length) return "Free";
                             const min = Math.min(...allPrices), max = Math.max(...allPrices);
-                            return min === max ? `₹${min}` : `₹${min} – ₹${max}`;
+                            return min === max ? `${formatCurrency(min)}` : `${formatCurrency(min)} – ${formatCurrency(max)}`;
                           })()
-                        : `₹${ev.price}`}
+                        : `${formatCurrency(ev.price)}`}
                     </span>
                     <span className={`rounded-full px-2 py-1 text-xs font-semibold capitalize ${ev.status === "upcoming" ? "bg-blue-500/15 text-blue-400" : ev.status === "ongoing" ? "bg-green-500/15 text-green-400" : "bg-gray-500/15 text-gray-400"}`}>
                       {ev.status}

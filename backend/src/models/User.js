@@ -1,9 +1,24 @@
 import mongoose from "mongoose";
+import { validateEmail } from "../utils/validation.js";
 
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      validate: {
+        validator(value) {
+          return validateEmail(value) === null;
+        },
+        message: (props) =>
+          validateEmail(props.value) ||
+          "Enter a valid email like user@gmail.com (letters and numbers only)",
+      },
+    },
     passwordHash: { type: String, required: true },
     role: {
       type: String,

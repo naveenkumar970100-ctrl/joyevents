@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { BarChart3, TrendingUp, DollarSign, Calendar, Users, MapPin, Star, ArrowUpRight, ArrowDownRight, Loader2, Activity, Zap, Target, Award } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import StatCard from "@/components/StatCard";
@@ -266,7 +267,7 @@ const AdminReports = () => {
               <DollarSign className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-sm sm:text-2xl font-bold">₹{analyticsData.dailyRevenue.toLocaleString()}</div>
+              <div className="text-sm sm:text-2xl font-bold">{formatCurrency(analyticsData.dailyRevenue)}</div>
               <p className="text-xs text-muted-foreground mt-1">Today's earnings</p>
             </CardContent>
           </Card>
@@ -277,7 +278,7 @@ const AdminReports = () => {
               <TrendingUp className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-sm sm:text-2xl font-bold">₹{analyticsData.weeklyRevenue.toLocaleString()}</div>
+              <div className="text-sm sm:text-2xl font-bold">{formatCurrency(analyticsData.weeklyRevenue)}</div>
               <p className="text-xs text-muted-foreground mt-1">Last 7 days</p>
             </CardContent>
           </Card>
@@ -288,7 +289,7 @@ const AdminReports = () => {
               <BarChart3 className="h-4 w-4 text-purple-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-sm sm:text-2xl font-bold">₹{analyticsData.monthlyRevenue.toLocaleString()}</div>
+              <div className="text-sm sm:text-2xl font-bold">{formatCurrency(analyticsData.monthlyRevenue)}</div>
               <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
             </CardContent>
           </Card>
@@ -372,7 +373,7 @@ const AdminReports = () => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-sm">₹{merchant.revenue.toLocaleString()}</p>
+                          <p className="font-semibold text-sm">{formatCurrency(merchant.revenue)}</p>
                           <p className="text-xs text-muted-foreground">{merchant.bookings} bookings</p>
                         </div>
                       </div>
@@ -411,7 +412,7 @@ const AdminReports = () => {
                         </div>
                         <div className="text-right">
                           <p className="font-semibold text-sm">{event.bookings} bookings</p>
-                          <p className="text-xs text-muted-foreground">₹{event.revenue.toLocaleString()}</p>
+                          <p className="text-xs text-muted-foreground">{formatCurrency(event.revenue)}</p>
                         </div>
                       </div>
                     ))}
@@ -461,7 +462,7 @@ const AdminReports = () => {
                               <Badge variant="outline">{loc.count}</Badge>
                             </td>
                             <td className="text-right px-4 py-3 font-semibold">
-                              ₹{loc.revenue.toLocaleString()}
+                              {formatCurrency(loc.revenue)}
                             </td>
                             <td className="text-right px-4 py-3">
                               <div className="flex items-center justify-end gap-2">

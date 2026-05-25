@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { BookOpen, Search, Filter, MapPin, ExternalLink } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
@@ -174,7 +175,7 @@ const AdminBookings = () => {
                             <span className="text-xs text-muted-foreground">—</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 font-semibold text-primary">₹{b.price?.toLocaleString()}</td>
+                        <td className="px-4 py-3 font-semibold text-primary">{formatCurrency(b.price)}</td>
                         <td className="px-4 py-3 text-muted-foreground text-xs">
                           <div>{new Date(b.datetime).toLocaleDateString()}</div>
                           <div>{new Date(b.datetime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>

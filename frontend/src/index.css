@@ -126,6 +126,18 @@
     @apply border-border;
   }
 
+  html {
+    /* Match the layout you see at 80% browser zoom while viewing at 100% */
+    zoom: 0.8;
+    font-size: 80%;
+  }
+
+  @supports (zoom: 0.8) {
+    html {
+      font-size: 100%;
+    }
+  }
+
   html, body {
     width: 100%;
     max-width: 100%;

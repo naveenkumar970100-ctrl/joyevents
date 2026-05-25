@@ -8,6 +8,7 @@ import Layout from "@/components/Layout";
 import { toast } from "sonner";
 import { Lock, ArrowRight, CheckCircle } from "lucide-react";
 import { apiResetPasswordWithToken } from "@/lib/api";
+import { validateNewPasswordForm, PASSWORD_HINT } from "@/lib/validation";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -21,8 +22,8 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPassword.length < 6) { toast.error("Password must be at least 6 characters"); return; }
-    if (newPassword !== confirm) { toast.error("Passwords do not match"); return; }
+    const pwdErr = validateNewPasswordForm(newPassword, confirm);
+    if (pwdErr) { toast.error(pwdErr); return; }
     setLoading(true);
     try {
       await apiResetPasswordWithToken(token, newPassword);
@@ -72,13 +73,14 @@ const ResetPassword = () => {
                     <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       type="password"
-                      placeholder="Min. 6 characters"
+                      placeholder="Min. 8 characters"
                       className="border-border bg-secondary pl-10"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                     />
                   </div>
+                  <p className="mt-1 text-xs text-muted-foreground">{PASSWORD_HINT}</p>
                 </div>
                 <div>
                   <Label className="text-sm text-muted-foreground">Confirm Password</Label>

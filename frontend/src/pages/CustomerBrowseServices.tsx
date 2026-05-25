@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Search, Loader2, Briefcase, ArrowLeft, SlidersHorizontal, X, Mail } from "lucide-react";
 import CustomerLayout from "@/components/CustomerLayout";
@@ -200,7 +201,7 @@ const CustomerBrowseServices = () => {
                         </span>
                         <div className="text-right">
                           <p className="text-lg font-bold text-primary">
-                            {promo.discountType === 'percentage' ? `${promo.discountValue}% OFF` : `₹${promo.discountValue} OFF`}
+                            {promo.discountType === 'percentage' ? `${promo.discountValue}% OFF` : `${formatCurrency(promo.discountValue)} OFF`}
                           </p>
                         </div>
                       </div>
@@ -208,7 +209,7 @@ const CustomerBrowseServices = () => {
                       <div className="mt-auto pt-2 flex items-center justify-between text-[10px] text-muted-foreground uppercase tracking-tight">
                         <span className="flex items-center gap-1">
                           <Ticket className="h-3 w-3" />
-                          Min. ₹{promo.minBookingAmount || 0}
+                          Min. {formatCurrency(promo.minBookingAmount || 0)}
                         </span>
                         {promo.expiryDate && (
                           <span>Expires: {new Date(promo.expiryDate).toLocaleDateString()}</span>
@@ -321,7 +322,7 @@ const CustomerBrowseServices = () => {
                 )}
                 {(priceMin || priceMax) && (
                   <span className="flex items-center gap-1 rounded-full bg-primary/15 border border-primary/30 px-3 py-1 text-xs font-medium text-primary">
-                    ₹{priceMin || "0"} – ₹{priceMax || "∞"}
+                    {formatCurrency(priceMin || "0")} – {formatCurrency(priceMax || "∞")}
                     <button onClick={() => { setPriceMin(""); setPriceMax(""); }}><X className="h-3 w-3" /></button>
                   </span>
                 )}
@@ -374,7 +375,7 @@ const CustomerBrowseServices = () => {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <span className="absolute bottom-3 left-3 rounded-full bg-gradient-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                      From ₹{svc.price}
+                      From {formatCurrency(svc.price)}
                     </span>
                   </div>
 

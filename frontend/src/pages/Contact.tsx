@@ -9,6 +9,7 @@ import { STATIC_IMAGES } from "@/lib/staticImages";
 import { useState } from "react";
 import { toast } from "sonner";
 import { usePlatformName, useSupportEmail } from "@/hooks/usePlatformName";
+import { sanitizeEmailInput, validateEmail, EMAIL_HINT, EMAIL_MAX_LENGTH } from "@/lib/validation";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
@@ -27,6 +28,11 @@ const Contact = () => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+    const emailErr = validateEmail(form.email);
+    if (emailErr) {
+      toast.error(emailErr);
       return;
     }
     setSending(true);
@@ -145,7 +151,8 @@ const Contact = () => {
                   </div>
                   <div>
                     <label className="mb-1 block text-xs font-medium text-muted-foreground">Your Email *</label>
-                    <Input type="email" placeholder="john@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="bg-secondary" required />
+                    <Input type="text" inputMode="email" maxLength={EMAIL_MAX_LENGTH} placeholder="user@gmail.com" value={form.email} onChange={(e) => setForm({ ...form, email: sanitizeEmailInput(e.target.value) })} className="bg-secondary" required />
+                    <p className="mt-1 text-xs text-muted-foreground">{EMAIL_HINT}</p>
                   </div>
                 </div>
                 <div>

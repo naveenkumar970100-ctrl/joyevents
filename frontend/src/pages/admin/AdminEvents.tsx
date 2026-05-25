@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { ImageIcon, Loader2, AlertCircle, Ticket } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { useEffect, useState } from "react";
@@ -119,7 +120,7 @@ const AdminEvents = () => {
                                 <div key={`${ticket.type}-${idx}`} className="flex items-center justify-between text-xs">
                                   <span className="capitalize text-muted-foreground">{ticket.type}:</span>
                                   <div className="flex items-center gap-2">
-                                    <span className="text-primary font-semibold">₹{ticket.price}</span>
+                                    <span className="text-primary font-semibold">{formatCurrency(ticket.price)}</span>
                                     <span className={isSoldOut ? "text-red-500 font-semibold" : "text-green-500 font-semibold"}>
                                       {isSoldOut ? "Sold Out" : `${remaining} left`}
                                     </span>
@@ -151,9 +152,9 @@ const AdminEvents = () => {
                               if (prices.length === 0) return "Free";
                               const min = Math.min(...prices);
                               const max = Math.max(...prices);
-                              return min === max ? `₹${min}` : `₹${min} – ₹${max}`;
+                              return min === max ? `${formatCurrency(min)}` : `${formatCurrency(min)} – ${formatCurrency(max)}`;
                             })()
-                          : `₹${ev.price}`}
+                          : `${formatCurrency(ev.price)}`}
                       </span>
                       <span className={`rounded-full px-2 py-1 text-xs font-semibold capitalize ${
                         ev.status === "upcoming" ? "bg-blue-500/15 text-blue-400" :

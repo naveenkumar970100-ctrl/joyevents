@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { Users, Calendar, Briefcase, History, Clock, CheckCircle, CheckCircle2, DollarSign, X, AlertCircle, Loader2, MapPin, ExternalLink, Video, Bell } from "lucide-react";
 
 import AdminLayout from "@/components/AdminLayout";
@@ -119,7 +120,7 @@ const AdminOverview = () => {
         <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard title="Total Users"     value={loading ? "…" : totalUsers.toLocaleString()}          icon={<Users className="h-5 w-5" />}       index={0} />
           <StatCard title="Total Merchants" value={loading ? "…" : totalMerchants}                       icon={<Briefcase className="h-5 w-5" />}    index={1} />
-          <StatCard title="Total Revenue"   value={loading ? "…" : `₹${totalRevenue.toLocaleString()}`} icon={<DollarSign className="h-5 w-5" />}   index={2} />
+          <StatCard title="Total Revenue"   value={loading ? "…" : `${formatCurrency(totalRevenue)}`} icon={<DollarSign className="h-5 w-5" />}   index={2} />
           <StatCard title="Total Events"    value={loading ? "…" : events.length}                        icon={<Calendar className="h-5 w-5" />}     index={3} />
         </div>
 
@@ -171,7 +172,7 @@ const AdminOverview = () => {
                   {bookings.map((b) => (
                     <tr key={b._id} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
                       <td className="px-4 py-3 font-medium">{b.serviceName || b.event}</td>
-                      <td className="px-4 py-3">₹{b.price}</td>
+                      <td className="px-4 py-3">{formatCurrency(b.price)}</td>
                       <td className="px-4 py-3">
                         {b.customer?.name || "—"}
                         {b.customer?.email && <span className="block text-xs text-muted-foreground">{b.customer.email}</span>}
@@ -372,7 +373,7 @@ const AdminOverview = () => {
                           <span className="text-xs text-muted-foreground">No location</span>
                         )}
                       </td>
-                      <td className="px-4 py-3">₹{b.price}</td>
+                      <td className="px-4 py-3">{formatCurrency(b.price)}</td>
                       <td className="px-4 py-3 text-muted-foreground">{new Date(b.datetime).toLocaleString()}</td>
                       <td className="px-4 py-3 text-muted-foreground">{new Date(b.createdAt).toLocaleDateString()}</td>
                       <td className="px-4 py-3">
@@ -421,7 +422,7 @@ const AdminOverview = () => {
           </div>
           <div className="rounded-xl border border-border bg-card p-3 sm:p-6">
             <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="font-display text-xs sm:text-3xl font-bold mt-1">{loading ? "…" : `₹${totalRevenue.toLocaleString()}`}</p>
+            <p className="font-display text-xs sm:text-3xl font-bold mt-1">{loading ? "…" : `${formatCurrency(totalRevenue)}`}</p>
             <p className="text-xs text-muted-foreground mt-1">From confirmed & completed bookings</p>
           </div>
         </motion.div>

@@ -3,6 +3,7 @@ import Booking from "../models/Booking.js";
 import User from "../models/User.js";
 import Notification from "../models/Notification.js";
 import { verifyToken, requireRole } from "../middleware/auth.js";
+import { formatCurrency } from "../utils/formatCurrency.js";
 
 const router = Router();
 
@@ -798,8 +799,8 @@ router.patch("/:id/approve", verifyToken, requireRole("merchant"), async (req, r
     let notificationMessage = "";
     if (isService) {
       notificationMessage = paymentType === "advance" 
-        ? `Your booking for ${updatedBooking.serviceName || updatedBooking.event?.title} has been approved with an advance payment requirement of ₹${advanceAmount}. Please pay to confirm.`
-        : `Your booking for ${updatedBooking.serviceName || updatedBooking.event?.title} has been approved. Please pay the full amount (₹${updatedBooking.price}) to confirm.`;
+        ? `Your booking for ${updatedBooking.serviceName || updatedBooking.event?.title} has been approved with an advance payment requirement of ${formatCurrency(advanceAmount)}. Please pay to confirm.`
+        : `Your booking for ${updatedBooking.serviceName || updatedBooking.event?.title} has been approved. Please pay the full amount (${formatCurrency(updatedBooking.price)}) to confirm.`;
     } else {
       notificationMessage = `Your booking for ${updatedBooking.serviceName || updatedBooking.event?.title} has been confirmed! Your tickets are now available.`;
     }
@@ -1475,7 +1476,7 @@ router.post("/:merchantId/process-payout", verifyToken, requireRole("admin"), as
       merchant: merchantId,
       type: "withdrawal",
       amount: totalAmount,
-      description: `Admin payout of ₹${totalAmount.toLocaleString()}${note ? ` — ${note}` : ""}`,
+      description: `Admin payout of ${formatCurrency(totalAmount)}${note ? ` — ${note}` : ""}`,
       status: "completed",
       relatedId: withdrawal._id.toString()
     });
@@ -1484,7 +1485,7 @@ router.post("/:merchantId/process-payout", verifyToken, requireRole("admin"), as
     await createNotification(
       merchantId,
       "Payout Credited ✅",
-      `₹${Number(totalAmount).toLocaleString()} has been credited to your account by admin. Transaction ID: ${transactionId}`,
+      `${formatCurrency(totalAmount)} has been credited to your account by admin. Transaction ID: ${transactionId}`,
       "booking",
       merchantId,
       "/merchant-dashboard/earnings"

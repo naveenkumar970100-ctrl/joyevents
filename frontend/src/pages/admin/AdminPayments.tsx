@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { DollarSign, CreditCard, Smartphone, CheckCircle, XCircle, RefreshCw, AlertCircle, Loader2 } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ const AdminPayments = () => {
 
   const handleRefund = async (booking: any) => {
     const confirmed = confirm(
-      `Are you sure you want to refund ₹${booking.price} for booking "${booking.serviceName || booking.eventName}"?\n\nThis will cancel the booking and mark the payment as refunded.\n\nThis action cannot be undone.`
+      `Are you sure you want to refund ${formatCurrency(booking.price)} for booking "${booking.serviceName || booking.eventName}"?\n\nThis will cancel the booking and mark the payment as refunded.\n\nThis action cannot be undone.`
     );
 
     if (!confirmed) return;
@@ -103,7 +104,7 @@ const AdminPayments = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Total Revenue</p>
-                  <p className="font-display text-xs sm:text-2xl font-bold truncate">₹{totalRevenue.toLocaleString()}</p>
+                  <p className="font-display text-xs sm:text-2xl font-bold truncate">{formatCurrency(totalRevenue)}</p>
                 </div>
               </div>
             </div>
@@ -129,7 +130,7 @@ const AdminPayments = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Refunded</p>
-                  <p className="font-display text-xs sm:text-2xl font-bold truncate">₹{totalRefunded.toLocaleString()}</p>
+                  <p className="font-display text-xs sm:text-2xl font-bold truncate">{formatCurrency(totalRefunded)}</p>
                 </div>
               </div>
             </div>
@@ -195,7 +196,7 @@ const AdminPayments = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className="font-semibold">₹{booking.price?.toLocaleString()}</span>
+                          <span className="font-semibold">{formatCurrency(booking.price)}</span>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">

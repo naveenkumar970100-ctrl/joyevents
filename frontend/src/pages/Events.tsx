@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Search, Filter, Calendar, MapPin, DollarSign, X, CreditCard, CheckCircle, Loader2, Clock, Image as ImageIcon, ChevronLeft, ChevronRight, ArrowRight, Tag, Ticket, Copy } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -360,7 +361,7 @@ const Events = () => {
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-border">
                     <span className="font-semibold text-primary">
-                      {promo.discountType === "percentage" ? `${promo.discountValue}% OFF` : `₹${promo.discountValue} OFF`}
+                      {promo.discountType === "percentage" ? `${promo.discountValue}% OFF` : `${formatCurrency(promo.discountValue)} OFF`}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       {promo.maxUses ? `${promo.currentUses}/${promo.maxUses} used` : "Unlimited"}

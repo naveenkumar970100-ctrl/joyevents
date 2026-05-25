@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 import { Briefcase, ImageIcon, Loader2, AlertCircle, Tag } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { useEffect, useState } from "react";
@@ -76,7 +77,7 @@ const AdminServices = () => {
                   <div className="p-4 flex flex-col gap-1 flex-1">
                     <p className="font-display font-semibold text-sm">{svc.name}</p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Tag className="h-3 w-3" /> {svc.category} · <span className="text-foreground font-medium">₹{svc.price}</span>
+                      <Tag className="h-3 w-3" /> {svc.category} · <span className="text-foreground font-medium">{formatCurrency(svc.price)}</span>
                     </p>
                     {svc.description && (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{svc.description}</p>

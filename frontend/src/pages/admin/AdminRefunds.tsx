@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { RefreshCcw, DollarSign, AlertCircle, CheckCircle, XCircle, Clock } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
@@ -106,7 +107,7 @@ const AdminRefunds = () => {
       // In a real implementation, this would call an API endpoint
       // await apiProcessRefund(selectedBooking._id, refundReason, token!);
       
-      toast.success(`Refund of ₹${selectedBooking.price} processed successfully`);
+      toast.success(`Refund of ${formatCurrency(selectedBooking.price)} processed successfully`);
       setRefundDialogOpen(false);
       setRefundReason("");
       loadRefunds();
@@ -157,7 +158,7 @@ const AdminRefunds = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Total Refunded</p>
-                    <p className="font-display text-xs sm:text-2xl font-bold truncate">₹{totalRefundAmount.toLocaleString()}</p>
+                    <p className="font-display text-xs sm:text-2xl font-bold truncate">{formatCurrency(totalRefundAmount)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -279,7 +280,7 @@ const AdminRefunds = () => {
                             </div>
                           </TableCell>
                           <TableCell className="font-semibold">
-                            ₹{booking.price?.toLocaleString()}
+                            {formatCurrency(booking.price)}
                           </TableCell>
                           <TableCell>
                             {booking.refundReason ? (
@@ -328,7 +329,7 @@ const AdminRefunds = () => {
           <DialogHeader>
             <DialogTitle>Process Refund</DialogTitle>
             <DialogDescription>
-              You are about to refund ₹{selectedBooking?.price?.toLocaleString()} to {selectedBooking?.customer?.name}
+              You are about to refund {formatCurrency(selectedBooking?.price)} to {selectedBooking?.customer?.name}
             </DialogDescription>
           </DialogHeader>
 
