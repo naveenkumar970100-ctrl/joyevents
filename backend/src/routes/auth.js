@@ -351,7 +351,30 @@ router.post("/forgot-password", async (req, res) => {
       }
     );
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:8080";
+    // Resolve frontend URL — prefer env var, but if it's still localhost
+    // fall back to the Origin/Referer header so the reset link works on
+    // any deployed domain without needing to update .env every time.
+    let frontendUrl = process.env.FRONTEND_URL || "";
+    const isLocalhost = !frontendUrl ||
+      frontendUrl.includes("localhost") ||
+      frontendUrl.includes("127.0.0.1");
+
+    if (isLocalhost) {
+      // Try to derive the real frontend URL from the request
+      const origin = req.headers.origin || req.headers.referer || "";
+      if (origin && !origin.includes("localhost") && !origin.includes("127.0.0.1")) {
+        // Strip trailing path from referer to get just the origin
+        try {
+          const parsed = new URL(origin);
+          frontendUrl = `${parsed.protocol}//${parsed.host}`;
+        } catch {
+          frontendUrl = origin.replace(/\/[^/]*$/, "");
+        }
+      } else {
+        frontendUrl = "http://localhost:8080";
+      }
+    }
+
     const resetUrl = `${frontendUrl}/reset-password?token=${token}${redirect ? `&redirect=${encodeURIComponent(String(redirect))}` : ""}`;
 
     const mailResult = await sendPasswordResetEmail({

@@ -484,7 +484,7 @@ const EventDetail = () => {
                                       <span className={`text-sm font-bold ${s.price}`}>{formatCurrency(t.price)}</span>
                                       {remaining <= 0
                                         ? <span className="text-xs text-red-400 font-semibold">Sold Out</span>
-                                        : <span className={`text-xs px-1.5 py-0.5 rounded-full border ${s.badge}`}>{remaining} left</span>}
+                                        : <span className={`text-xs px-1.5 py-0.5 rounded-full border ${s.badge}`}>Available</span>}
                                     </div>
                                   </div>
                                 </div>
@@ -510,7 +510,14 @@ const EventDetail = () => {
                         <div className="flex items-center gap-3 mt-2">
                           <button onClick={() => setFullServiceQty(q => Math.max(1, q - 1))} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">−</button>
                           <span className="w-10 text-center font-semibold text-lg">{fullServiceQty}</span>
-                          <button onClick={() => setFullServiceQty(q => q + 1)} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">+</button>
+                          <button 
+                            disabled={event.maxAttendees > 0 && fullServiceQty >= (event.maxAttendees - (event.attendeesCount || 0))} 
+                            onClick={() => {
+                              const remaining = event.maxAttendees > 0 ? (event.maxAttendees - (event.attendeesCount || 0)) : Infinity;
+                              setFullServiceQty(q => Math.min(q + 1, remaining));
+                            }} 
+                            className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          >+</button>
                           <span className="text-xs text-muted-foreground ml-1">× {formatCurrency(event.price)} each</span>
                         </div>
                       </div>
@@ -603,21 +610,6 @@ const EventDetail = () => {
                 ) : (
                   /* ── Not logged in or not a customer: show price + login prompt ── */
                   <>
-                    {event.eventType === "fullService" && (
-                      <div className="p-3 rounded-lg bg-secondary/50 border border-border">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium flex items-center gap-1">
-                            <Users className="h-4 w-4 text-primary" /> Number of Tickets
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 mt-2">
-                          <button onClick={() => setFullServiceQty(q => Math.max(1, q - 1))} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">−</button>
-                          <span className="w-10 text-center font-semibold text-lg">{fullServiceQty}</span>
-                          <button onClick={() => setFullServiceQty(q => q + 1)} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">+</button>
-                          <span className="text-xs text-muted-foreground ml-1">× {formatCurrency(event.price)} each</span>
-                        </div>
-                      </div>
-                    )}
                     <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 text-center space-y-3">
                       <Ticket className="h-8 w-8 text-primary mx-auto" />
                       <p className="text-sm font-semibold">Sign in as a customer to select seats and book</p>
@@ -901,7 +893,7 @@ const EventDetail = () => {
                               {isSoldOut ? (
                                 <span className="text-red-500 text-sm font-semibold">SOLD OUT</span>
                               ) : (
-                                <span className="text-green-500 text-sm font-semibold">{remaining} available</span>
+                                <span className="text-green-500 text-sm font-semibold">Available</span>
                               )}
                             </div>
                           </div>
@@ -979,7 +971,7 @@ const EventDetail = () => {
                         {isSoldOut ? (
                           <span className="text-red-500 text-sm font-semibold">SOLD OUT</span>
                         ) : (
-                          <span className="text-green-500 text-sm font-semibold">{remaining} available</span>
+                          <span className="text-green-500 text-sm font-semibold">Available</span>
                         )}
                       </div>
                     </div>

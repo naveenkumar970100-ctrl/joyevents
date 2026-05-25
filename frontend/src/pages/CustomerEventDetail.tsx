@@ -530,7 +530,14 @@ const CustomerEventDetail = () => {
                         <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-secondary/30">
                           <button onClick={() => setFullServiceQty(q => Math.max(1, q - 1))} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">−</button>
                           <span className="w-10 text-center font-semibold text-lg">{fullServiceQty}</span>
-                          <button onClick={() => setFullServiceQty(q => q + 1)} className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors">+</button>
+                          <button 
+                            disabled={event.maxAttendees > 0 && fullServiceQty >= (event.maxAttendees - (event.attendeesCount || 0))} 
+                            onClick={() => {
+                              const remaining = event.maxAttendees > 0 ? (event.maxAttendees - (event.attendeesCount || 0)) : Infinity;
+                              setFullServiceQty(q => Math.min(q + 1, remaining));
+                            }} 
+                            className="w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 font-bold text-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          >+</button>
                           <span className="text-xs text-muted-foreground ml-1">× {formatCurrency(event.price)} each</span>
                         </div>
                       )}

@@ -79,9 +79,8 @@ export default defineConfig({
     },
     // Vite dev server natively handles SPA routing
     proxy: {
-      // Proxy API requests to backend during development
       '/api': {
-        target: 'http://localhost:5001',
+        target: 'http://localhost:5000',
         changeOrigin: true,
       }
     }

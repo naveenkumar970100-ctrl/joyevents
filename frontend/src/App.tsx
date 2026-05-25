@@ -87,6 +87,7 @@ const PageLoader = () => (
 // Inner component so useGoogleTranslate can access i18n context
 const AppRoutes = () => {
   useGoogleTranslate();
+
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
