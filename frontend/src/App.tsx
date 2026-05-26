@@ -53,7 +53,6 @@ const CustomerBrowseEvents = lazy(() => import("./pages/CustomerBrowseEvents"));
 const CustomerBrowseServices = lazy(() => import("./pages/CustomerBrowseServices"));
 const CustomerEventDetail = lazy(() => import("./pages/CustomerEventDetail"));
 const CustomerServiceDetail = lazy(() => import("./pages/CustomerServiceDetail"));
-const AdminLanguage = lazy(() => import("./pages/admin/AdminLanguage"));
 const MyRequests = lazy(() => import("./pages/MyRequests"));
 const MerchantBookings = lazy(() => import("./pages/MerchantBookings"));
 const MerchantInbox = lazy(() => import("./pages/MerchantInbox"));
@@ -61,6 +60,7 @@ const EarningsDashboard = lazy(() => import("./pages/EarningsDashboard"));
 const MarketingTools = lazy(() => import("./pages/MarketingTools"));
 const EventAnalytics = lazy(() => import("./pages/EventAnalytics"));
 const Blog = lazy(() => import("./pages/Blog"));
+const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 const Reviews = lazy(() => import("./pages/Reviews"));
 const BookingHistory = lazy(() => import("./pages/BookingHistory"));
 const UpcomingBookings = lazy(() => import("./pages/UpcomingBookings"));
@@ -72,8 +72,6 @@ const AIRecommendations = lazy(() => import("./pages/AIRecommendations"));
 const MerchantRecommendations = lazy(() => import("./pages/MerchantRecommendations"));
 const AdminRecommendations = lazy(() => import("./pages/admin/AdminRecommendations"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const LanguageSettings = lazy(() => import("./pages/LanguageSettings"));
-const MerchantLanguage = lazy(() => import("./pages/MerchantLanguage"));
 
 const queryClient = new QueryClient();
 
@@ -97,6 +95,7 @@ const AppRoutes = () => {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/events" element={<Events />} />
         <Route path="/events/:id" element={<EventDetail />} />
@@ -128,7 +127,6 @@ const AppRoutes = () => {
         <Route path="/customer-dashboard/settings" element={<ProtectedRoute allowedRoles={["customer"]}><CustomerSettings /></ProtectedRoute>} />
         <Route path="/customer-dashboard/profile" element={<ProtectedRoute allowedRoles={["customer"]}><CustomerProfile /></ProtectedRoute>} />
         <Route path="/customer-dashboard/ai-recommendations" element={<ProtectedRoute allowedRoles={["customer"]}><AIRecommendations /></ProtectedRoute>} />
-        <Route path="/customer-dashboard/language" element={<ProtectedRoute allowedRoles={["customer"]}><LanguageSettings /></ProtectedRoute>} />
         
         {/* Merchant Routes */}
         <Route path="/merchant-dashboard/events" element={<ProtectedRoute allowedRoles={["merchant"]}><MerchantEvents /></ProtectedRoute>} />
@@ -145,7 +143,6 @@ const AppRoutes = () => {
         <Route path="/merchant-dashboard/qr-codes" element={<ProtectedRoute allowedRoles={["merchant"]}><QRCodeGenerator /></ProtectedRoute>} />
         <Route path="/merchant-dashboard/settings" element={<ProtectedRoute allowedRoles={["merchant"]}><MerchantSettings /></ProtectedRoute>} />
         <Route path="/merchant-dashboard/ai-recommendations" element={<ProtectedRoute allowedRoles={["merchant"]}><MerchantRecommendations /></ProtectedRoute>} />
-        <Route path="/merchant-dashboard/language" element={<ProtectedRoute allowedRoles={["merchant"]}><MerchantLanguage /></ProtectedRoute>} />
         {/* Legacy merchant routes (kept for backwards compat) */}
         <Route path="/merchant-settings" element={<ProtectedRoute allowedRoles={["merchant", "admin"]}><MerchantSettings /></ProtectedRoute>} />
         <Route path="/customer-settings" element={<ProtectedRoute allowedRoles={["customer"]}><CustomerSettings /></ProtectedRoute>} />
@@ -170,7 +167,6 @@ const AppRoutes = () => {
         <Route path="/admin-dashboard/bookings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminBookings /></ProtectedRoute>} />
         <Route path="/admin-dashboard/reports" element={<ProtectedRoute allowedRoles={["admin"]}><AdminReports /></ProtectedRoute>} />
         <Route path="/admin-dashboard/ai-recommendations" element={<ProtectedRoute allowedRoles={["admin"]}><AdminRecommendations /></ProtectedRoute>} />
-        <Route path="/admin-dashboard/language" element={<ProtectedRoute allowedRoles={["admin"]}><AdminLanguage /></ProtectedRoute>} />
         <Route path="/create-event" element={<ProtectedRoute allowedRoles={["merchant"]}><CreateEvent /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>

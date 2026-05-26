@@ -324,7 +324,7 @@ router.post("/", verifyToken, async (req, res) => {
 
         // Get commission rate from settings (default 10%)
         const commissionSetting = await Settings.findOne({ key: "commissionRate" });
-        const commissionRate = commissionSetting ? Number(commissionSetting.value) : 10;
+        const commissionRate = commissionSetting ? Number(commissionSetting.value) : 5;
         const commissionAmount = Math.round((Number(price) * commissionRate) / 100);
         const merchantEarning = Number(price) - commissionAmount;
 
@@ -911,7 +911,7 @@ router.patch("/:id/pay", verifyToken, async (req, res) => {
         const Settings = (await import("../models/Settings.js")).default;
 
         const commissionSetting = await Settings.findOne({ key: "commissionRate" });
-        const commissionRate = commissionSetting ? Number(commissionSetting.value) : 10;
+        const commissionRate = commissionSetting ? Number(commissionSetting.value) : 5;
 
         const amountForTransaction = paymentType === "advance"
           ? updatedBooking.advanceAmount

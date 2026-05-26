@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { LayoutDashboard, Ticket, History, Calendar, Settings, User, CalendarDays, Briefcase, Heart, MessageSquare, X, Sparkles, Globe, Menu, LogOut } from "lucide-react";
+import { LayoutDashboard, Ticket, History, Calendar, Settings, User, CalendarDays, Briefcase, Heart, MessageSquare, X, Sparkles, Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { clearSession } from "@/lib/session";
 
@@ -24,7 +24,6 @@ const NavLinks = ({ onClose }: { onClose?: () => void }) => {
     { to: "/customer-dashboard/upcoming",           label: t("upcoming"),          icon: Calendar },
     { to: "/customer-dashboard/favorites",          label: t("favorites"),         icon: Heart },
     { to: "/customer-dashboard/ai-recommendations", label: t("ai_picks"),          icon: Sparkles, highlight: true },
-    { to: "/customer-dashboard/language",           label: t("language"),          icon: Globe },
     { to: "/customer-dashboard/messages",           label: t("messages"),          icon: MessageSquare },
     { to: "/customer-dashboard/settings",           label: t("settings"),          icon: Settings },
     { to: "/customer-dashboard/profile",            label: t("my_profile"),        icon: User },

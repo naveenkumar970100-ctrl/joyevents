@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { dashboardPaths, roleLabels } from "@/lib/auth";
 import NotificationBell from "@/components/NotificationBell";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { usePlatformName } from "@/hooks/usePlatformName";
 import {
   DropdownMenu,
@@ -248,8 +247,6 @@ const Navbar = ({ hideDashboardLinks = false, onSidebarToggle }: { hideDashboard
             <NotificationBell />
           )}
 
-          <LanguageSwitcher />
-
           <Button
             variant="ghost"
             size="sm"
@@ -398,7 +395,6 @@ const Navbar = ({ hideDashboardLinks = false, onSidebarToggle }: { hideDashboard
             </div>
           )}
           <div className="flex gap-2">
-            <LanguageSwitcher />
             <button
               onClick={() => { setTheme(theme === "dark" ? "light" : "dark"); }}
               className="flex-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
@@ -573,16 +569,13 @@ const Navbar = ({ hideDashboardLinks = false, onSidebarToggle }: { hideDashboard
                     <div className="ml-auto"><NotificationBell /></div>
                   </div>
                 )}
-                <div className="flex gap-2">
-                  <LanguageSwitcher />
-                  <button
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="flex-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-                  >
-                    {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                    {theme === "dark" ? t("light_mode") : t("dark_mode")}
-                  </button>
-                </div>
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+                >
+                  {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                  {theme === "dark" ? t("light_mode") : t("dark_mode")}
+                </button>
           {!isAuthPage && (
             isLoggedIn ? (
               <button onClick={handleLogout}

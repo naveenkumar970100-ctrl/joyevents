@@ -7,7 +7,20 @@ import { Label } from "@/components/ui/label";
 import { API_URL } from "@/lib/config";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { sanitizeEmailInput, validateEmail, EMAIL_HINT, EMAIL_MAX_LENGTH } from "@/lib/validation";
+import {
+  sanitizeEmailInput,
+  sanitizeNameInput,
+  sanitizeMessageInput,
+  validateEmail,
+  validateName,
+  validateMessage,
+  NAME_MAX_LENGTH,
+  EMAIL_MAX_LENGTH,
+  MESSAGE_MAX_LENGTH,
+  NAME_HINT,
+  EMAIL_HINT,
+  MESSAGE_HINT,
+} from "@/lib/validation";
 
 interface Props {
   itemTitle: string;
@@ -31,9 +44,19 @@ const ContactMerchantModal = ({ itemTitle, eventId, serviceId, merchantId, onClo
       toast.error("Please fill in all fields");
       return;
     }
+    const nameErr = validateName(name);
+    if (nameErr) {
+      toast.error(nameErr);
+      return;
+    }
     const emailErr = validateEmail(email);
     if (emailErr) {
       toast.error(emailErr);
+      return;
+    }
+    const messageErr = validateMessage(message);
+    if (messageErr) {
+      toast.error(messageErr);
       return;
     }
     setLoading(true);
@@ -55,7 +78,7 @@ const ContactMerchantModal = ({ itemTitle, eventId, serviceId, merchantId, onClo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -89,7 +112,15 @@ const ContactMerchantModal = ({ itemTitle, eventId, serviceId, merchantId, onClo
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label className="text-xs text-muted-foreground">Your Name</Label>
-                <Input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" className="mt-1" required />
+                <Input
+                  value={name}
+                  maxLength={NAME_MAX_LENGTH}
+                  onChange={e => setName(sanitizeNameInput(e.target.value))}
+                  placeholder="Your name"
+                  className="mt-1"
+                  required
+                />
+                <p className="mt-1 text-xs text-muted-foreground">{NAME_HINT}</p>
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">Your Email</Label>
@@ -100,12 +131,14 @@ const ContactMerchantModal = ({ itemTitle, eventId, serviceId, merchantId, onClo
                 <Label className="text-xs text-muted-foreground">Message</Label>
                 <textarea
                   value={message}
-                  onChange={e => setMessage(e.target.value)}
+                  maxLength={MESSAGE_MAX_LENGTH}
+                  onChange={e => setMessage(sanitizeMessageInput(e.target.value))}
                   placeholder="Ask anything about this event or service..."
                   rows={4}
                   required
                   className="mt-1 w-full rounded-lg border border-border bg-secondary px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 />
+                <p className="mt-1 text-xs text-muted-foreground">{MESSAGE_HINT}</p>
               </div>
               <Button type="submit" className="w-full bg-gradient-primary text-primary-foreground hover:opacity-90" disabled={loading}>
                 {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Sending...</> : <><Send className="h-4 w-4 mr-2" /> Send Message</>}

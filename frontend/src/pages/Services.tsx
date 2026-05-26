@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowRight, X, Loader2, Briefcase, CheckCircle2, Star, Users, Zap, Search, Filter, Image as ImageIcon, ChevronLeft, ChevronRight, MapPin, Navigation, Tag, Heart, Ticket, Copy, Mail } from "lucide-react";
+import { ArrowRight, X, Loader2, Briefcase, CheckCircle2, Star, Users, Zap, Search, Image as ImageIcon, ChevronLeft, ChevronRight, MapPin, Navigation, Tag, Heart, Ticket, Copy, Mail } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,7 +45,6 @@ const Services = () => {
   const [search, setSearch] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState(searchParams.get("category") || "All");
-  const [showFilters, setShowFilters] = useState(false);
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
@@ -370,22 +369,8 @@ const Services = () => {
               />
             </div>
 
-            {/* Filter Section */}
+            {/* Category Pills */}
             <div className="flex flex-wrap items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-                className={`gap-2 ${showFilters ? 'bg-primary text-primary-foreground' : ''}`}
-              >
-                <Filter className="h-4 w-4" />
-                Filters
-                {activeCategory !== "All" && (
-                  <span className="ml-1 rounded-full bg-primary-foreground px-2 py-0.5 text-xs font-semibold">
-                    {activeCategory}
-                  </span>
-                )}
-              </Button>
               {role === "admin" && (
                 <Button
                   variant="outline"
@@ -393,12 +378,11 @@ const Services = () => {
                   onClick={() => setShowCatModal(true)}
                   className="gap-1 rounded-md"
                 >
-                  <Filter className="h-4 w-4" /> Manage Categories
+                  Manage Categories
                 </Button>
               )}
-
               <div className="flex flex-wrap gap-2">
-                {categories.slice(0, 5).map((cat) => (
+                {categories.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => handleCategoryChange(cat)}
@@ -410,60 +394,8 @@ const Services = () => {
                     {cat}
                   </button>
                 ))}
-                {categories.length > 5 && showFilters && (
-                  <>
-                    {categories.slice(5).map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => handleCategoryChange(cat)}
-                        className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all ${activeCategory === cat
-                          ? "bg-gradient-primary text-primary-foreground shadow-md"
-                          : "bg-secondary text-muted-foreground hover:bg-secondary/80"
-                          }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </>
-                )}
               </div>
             </div>
-
-            {/* Expanded Filter Panel */}
-            {showFilters && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                className="rounded-xl border border-border bg-card p-4 shadow-sm overflow-hidden"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-sm">All Categories</h3>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleCategoryChange("All")}
-                    className="h-8 text-xs"
-                  >
-                    Clear All
-                  </Button>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => handleCategoryChange(cat)}
-                      className={`p-3 rounded-lg text-sm font-medium transition-all ${activeCategory === cat
-                        ? "bg-gradient-primary text-primary-foreground shadow-md"
-                        : "bg-secondary text-muted-foreground hover:bg-secondary/80"
-                        }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
           </div>
 
           {loading ? (
@@ -487,7 +419,7 @@ const Services = () => {
                   transition={{ delay: i * 0.07 }}
                   className="group rounded-2xl border border-border bg-card overflow-hidden flex flex-col hover:border-primary/50 transition-colors"
                 >
-                  <div className="relative overflow-hidden bg-secondary flex-shrink-0 aspect-[3/4] sm:aspect-auto sm:h-52">
+                  <div className="relative overflow-hidden bg-secondary flex-shrink-0 aspect-[3/4] sm:aspect-auto sm:h-52 cursor-pointer" onClick={() => navigate(`/services/${svc._id}`)}>
                     {imgSrc(svc.image) ? (
                       <img src={imgSrc(svc.image)} alt={svc.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     ) : (
@@ -501,7 +433,7 @@ const Services = () => {
                     </span>
                   </div>
                   <div className="p-2 sm:p-5 flex flex-col flex-1">
-                    <h3 className="font-display text-lg font-semibold text-foreground">{svc.name}</h3>
+                    <h3 className="font-display text-lg font-semibold text-foreground cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(`/services/${svc._id}`)}>{svc.name}</h3>
                     {svc.highlights?.length > 0 && (
                       <ul className="mt-3 space-y-1">
                         {svc.highlights.slice(0, 2).map((h: string) => (
@@ -511,7 +443,10 @@ const Services = () => {
                           </li>
                         ))}
                         {svc.highlights.length > 2 && (
-                          <li className="text-xs text-primary font-medium pl-3">
+                          <li
+                            className="text-xs text-primary font-medium pl-3 cursor-pointer hover:underline"
+                            onClick={() => navigate(`/services/${svc._id}`)}
+                          >
                             +{svc.highlights.length - 2} more
                           </li>
                         )}
@@ -846,7 +781,7 @@ const Services = () => {
 
               {/* Location Picker Modal */}
               {showLocationPicker && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setShowLocationPicker(false)}>
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
                   <div className="relative w-full max-w-4xl rounded-2xl border border-border bg-card p-6 shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                     <button className="absolute top-4 right-4 text-muted-foreground hover:text-foreground" onClick={() => setShowLocationPicker(false)}>
                       <X className="h-5 w-5" />

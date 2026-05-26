@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { apiRegister } from "@/lib/api";
 import { Link } from "react-router-dom";
-import { sanitizeEmailInput, validateSignupForm, EMAIL_HINT, PASSWORD_HINT, EMAIL_MAX_LENGTH } from "@/lib/validation";
+import { sanitizeEmailInput, sanitizeNameInput, validateSignupForm, NAME_MAX_LENGTH, NAME_HINT, EMAIL_HINT, PASSWORD_HINT, EMAIL_MAX_LENGTH } from "@/lib/validation";
 const Register = () => {
   const { role } = useAuth();
   const navigate = useNavigate();
@@ -61,8 +61,15 @@ const Register = () => {
               <Label className="text-sm text-muted-foreground">Full Name</Label>
               <div className="relative mt-1">
                 <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input placeholder="John Doe" className="border-border bg-secondary pl-10" value={name} onChange={(e) => setName(e.target.value)} />
+                <Input
+                  placeholder="John Doe"
+                  maxLength={NAME_MAX_LENGTH}
+                  className="border-border bg-secondary pl-10"
+                  value={name}
+                  onChange={(e) => setName(sanitizeNameInput(e.target.value))}
+                />
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">{NAME_HINT}</p>
             </div>
             <div>
               <Label className="text-sm text-muted-foreground">Email</Label>
@@ -83,7 +90,7 @@ const Register = () => {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </button>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{PASSWORD_HINT}</p>

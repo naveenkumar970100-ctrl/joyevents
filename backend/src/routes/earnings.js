@@ -3,12 +3,21 @@ import Booking from "../models/Booking.js";
 import User from "../models/User.js";
 import Withdrawal from "../models/Withdrawal.js";
 import Transaction from "../models/Transaction.js";
+import Settings from "../models/Settings.js";
 import { verifyToken, requireRole } from "../middleware/auth.js";
 import { formatCurrency } from "../utils/formatCurrency.js";
 
 const router = Router();
 
-const COMMISSION_RATE = 0.05; // 5% commission
+// Read commission rate from DB — falls back to 10% if not set
+async function getCommissionRate() {
+  try {
+    const doc = await Settings.findOne({ key: "commissionRate" });
+    return doc ? Number(doc.value) / 100 : 0.10;
+  } catch {
+    return 0.10;
+  }
+}
 
 // Merchant: Get earnings dashboard data
 router.get("/dashboard", verifyToken, async (req, res) => {
@@ -27,22 +36,32 @@ router.get("/dashboard", verifyToken, async (req, res) => {
       ]
     });
 
+    const earningTransactions = await Transaction.find({ merchant: merchantId, type: "earning", status: "completed" });
+    const commissionTransactions = await Transaction.find({ merchant: merchantId, type: "commission_deduction", status: "completed" });
 
-    // Calculate total earnings (95% of booking price, using actual paid amount for advance payments)
-    const totalEarnings = completedBookings.reduce((sum, b) => {
-      const paidAmount = (b.paymentStatus === "partially_paid" && b.isAdvancePaid)
-        ? (b.advanceAmount || 0)
-        : (b.price || 0);
-      return sum + (paidAmount * (1 - COMMISSION_RATE));
-    }, 0);
-    
-    // Calculate total commission deducted
-    const totalCommission = completedBookings.reduce((sum, b) => {
-      const paidAmount = (b.paymentStatus === "partially_paid" && b.isAdvancePaid)
-        ? (b.advanceAmount || 0)
-        : (b.price || 0);
-      return sum + (paidAmount * COMMISSION_RATE);
-    }, 0);
+    let totalEarnings = earningTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+    let totalCommission = commissionTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+
+    // Only fall back to live rate calculation if no Transaction records exist yet
+    const COMMISSION_RATE = await getCommissionRate();
+
+    if (earningTransactions.length === 0) {
+      totalEarnings = completedBookings.reduce((sum, b) => {
+        const paidAmount = (b.paymentStatus === "partially_paid" && b.isAdvancePaid)
+          ? (b.advanceAmount || 0)
+          : (b.price || 0);
+        return sum + (paidAmount * (1 - COMMISSION_RATE));
+      }, 0);
+    }
+
+    if (commissionTransactions.length === 0) {
+      totalCommission = completedBookings.reduce((sum, b) => {
+        const paidAmount = (b.paymentStatus === "partially_paid" && b.isAdvancePaid)
+          ? (b.advanceAmount || 0)
+          : (b.price || 0);
+        return sum + (paidAmount * COMMISSION_RATE);
+      }, 0);
+    }
 
     // Get pending withdrawals
     const pendingWithdrawals = await Withdrawal.find({
@@ -70,7 +89,6 @@ router.get("/dashboard", verifyToken, async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(20)
       .populate("booking", "serviceName event price");
-
 
     res.json({
       totalEarnings: Math.round(totalEarnings * 100) / 100,
@@ -100,16 +118,8 @@ router.post("/withdrawal-request", verifyToken, async (req, res) => {
     }
 
     // Get merchant's available balance
-    const completedBookings = await Booking.find({
-      assignedTo: merchantId,
-      $or: [
-        { status: "completed", paymentStatus: "paid" },
-        { status: "confirmed", paymentStatus: "paid", event: { $ne: null } },
-        { status: "paid", paymentStatus: "paid" }
-      ]
-    });
-
-    const totalEarnings = completedBookings.reduce((sum, b) => sum + (b.price * (1 - COMMISSION_RATE)), 0);
+    const earningTransactions = await Transaction.find({ merchant: merchantId, type: "earning", status: "completed" });
+    const totalEarnings = earningTransactions.reduce((sum, t) => sum + t.amount, 0);
 
     const completedWithdrawals = await Withdrawal.find({
       merchant: merchantId,

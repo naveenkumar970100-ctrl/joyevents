@@ -1,14 +1,34 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-/** Scroll to top on every route change (window + dashboard <main> panes). */
+/**
+ * Scroll to top on every route change.
+ * Uses layout effect so the window is reset before the new page paints.
+ */
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    if (window.history?.scrollRestoration) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    const scrollTargets = [
+      window,
+      document.documentElement,
+      document.body,
+      document.scrollingElement,
+    ].filter(Boolean) as Array<Window | HTMLElement>;
+
+    scrollTargets.forEach((target) => {
+      if (target === window) {
+        window.scrollTo(0, 0);
+      } else {
+        (target as HTMLElement).scrollTop = 0;
+      }
+    });
 
     document.querySelectorAll("main").forEach((el) => {
       el.scrollTop = 0;

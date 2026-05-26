@@ -5,92 +5,7 @@ import Layout from "@/components/Layout";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-const BLOG_POSTS = [
-  {
-    id: 1,
-    title: "10 Tips for Planning the Perfect Corporate Event",
-    excerpt:
-      "From venue selection to catering and entertainment — here's everything you need to know to pull off a seamless corporate event that impresses clients and energizes your team.",
-    category: "Corporate Events",
-    author: "Sophia Mitchell",
-    date: "February 28, 2026",
-    readTime: "7 min read",
-    image: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80",
-    featured: true,
-  },
-  {
-    id: 2,
-    title: "How to Choose the Right Venue for Your Wedding",
-    excerpt:
-      "The venue sets the tone for your entire wedding day. Discover how to evaluate capacity, ambience, catering options, and hidden costs before you sign the contract.",
-    category: "Wedding Planning",
-    author: "James Harrington",
-    date: "February 20, 2026",
-    readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80",
-    featured: true,
-  },
-  {
-    id: 3,
-    title: "The Ultimate Guide to Event Photography",
-    excerpt:
-      "Great event photography preserves your memories for a lifetime. Learn what to look for in a photographer, how to brief them, and how to get the best shots on the day.",
-    category: "Photography",
-    author: "Aiden Clarke",
-    date: "February 14, 2026",
-    readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1452802447250-470a88ac82bc?w=800&q=80",
-    featured: false,
-  },
-  {
-    id: 4,
-    title: "Trending Decor Ideas for 2026 Events",
-    excerpt:
-      "From sustainable floral arrangements to immersive lighting experiences, discover the decor trends that are defining events this year and how to incorporate them on any budget.",
-    category: "Decor",
-    author: "Priya Nair",
-    date: "February 7, 2026",
-    readTime: "4 min read",
-    image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&q=80",
-    featured: false,
-  },
-  {
-    id: 5,
-    title: "Catering for Large Events: What Every Planner Should Know",
-    excerpt:
-      "Managing food and beverage for hundreds of guests is a logistical challenge. Here's how to coordinate with caterers, handle dietary needs, and ensure a smooth service.",
-    category: "Catering",
-    author: "Sophia Mitchell",
-    date: "January 30, 2026",
-    readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1555244162-803834f70033?w=800&q=80",
-    featured: false,
-  },
-  {
-    id: 6,
-    title: "Brand Activations That Actually Work: Case Studies",
-    excerpt:
-      "Brand activations are more than a stunt — they're an opportunity to build lasting emotional connections. We break down 5 successful activations and the strategies behind them.",
-    category: "Brand Activations",
-    author: "Marcus Webb",
-    date: "January 22, 2026",
-    readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
-    featured: false,
-  },
-];
-
-const CATEGORIES = ["All", "Corporate Events", "Wedding Planning", "Photography", "Decor", "Catering", "Brand Activations"];
-
-const categoryColors: Record<string, string> = {
-  "Corporate Events": "bg-blue-500/20 text-blue-400",
-  "Wedding Planning": "bg-pink-500/20 text-pink-400",
-  "Photography": "bg-purple-500/20 text-purple-400",
-  "Decor": "bg-green-500/20 text-green-400",
-  "Catering": "bg-orange-500/20 text-orange-400",
-  "Brand Activations": "bg-yellow-500/20 text-yellow-400",
-};
+import { BLOG_POSTS, CATEGORIES, categoryColors } from "@/data/blogPosts";
 
 const Blog = () => {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -146,6 +61,18 @@ const Blog = () => {
               />
             </div>
           </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="mx-auto mt-6"
+          >
+            <Link to="/contact">
+              <Button className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90">
+                Contact Us
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 
@@ -186,9 +113,9 @@ const Blog = () => {
                       <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{post.date}</span>
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{post.readTime}</span>
                     </div>
-                    <span className="flex items-center gap-1 text-primary font-medium">
+                    <Link to={`/blog/${post.id}`} className="inline-flex items-center gap-1 text-primary font-medium hover:underline">
                       Read more <ArrowRight className="h-3 w-3" />
-                    </span>
+                    </Link>
                   </div>
                 </div>
               </motion.article>
@@ -259,26 +186,25 @@ const Blog = () => {
         )}
       </section>
 
-      {/* Newsletter CTA */}
       <section className="container mx-auto py-16">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="rounded-3xl bg-gradient-to-br from-primary/20 via-secondary to-background border border-primary/20 p-10 text-center"
+          className="rounded-3xl border border-border bg-card p-10 text-center"
         >
-          <h2 className="font-display mb-3 text-3xl font-bold">Stay in the Loop</h2>
-          <p className="mx-auto mb-6 max-w-md text-muted-foreground">
-            Get the latest event planning tips, trends, and exclusive offers delivered straight to your inbox.
+          <h2 className="font-display mb-4 text-3xl font-bold">Have a question?</h2>
+          <p className="mx-auto mb-6 max-w-2xl text-muted-foreground">
+            Want to talk to our event experts? Reach out for tailored advice, custom packages, and support for your next event.
           </p>
-          <div className="mx-auto flex max-w-sm flex-col gap-3 sm:flex-row">
-            <Input placeholder="Enter your email" className="flex-1" />
-            <Button className="bg-gradient-primary text-primary-foreground hover:opacity-90">
-              Subscribe
+          <Link to="/contact">
+            <Button className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90">
+              Contact Us
             </Button>
-          </div>
+          </Link>
         </motion.div>
       </section>
+
     </Layout>
   );
 };

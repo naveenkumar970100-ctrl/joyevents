@@ -1089,6 +1089,28 @@ export async function apiSavePlatformSettings(data: { platformName: string; supp
   return res.json();
 }
 
+export async function apiGetCommissionRate() {
+  const res = await fetch(`${API_URL}/api/settings/commission`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.message || "Failed to fetch commission rate");
+  }
+  return res.json() as Promise<{ commissionRate: number }>;
+}
+
+export async function apiSaveCommissionRate(commissionRate: number, token: string) {
+  const res = await fetch(`${API_URL}/api/settings/commission`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ commissionRate }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.message || "Failed to save commission rate");
+  }
+  return res.json();
+}
+
 // ── Password Reset ───────────────────────────────────────────────────────────
 
 export async function apiForgotPassword(email: string, redirect?: string) {

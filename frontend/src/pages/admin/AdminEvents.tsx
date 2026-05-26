@@ -47,7 +47,7 @@ const AdminEvents = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="font-display text-xs sm:text-3xl font-bold truncate">
-              Event <span className="text-gradient">Monitoring</span>
+              Events
             </h1>
             <p className="text-muted-foreground text-sm mt-1">View all events - Read-only access</p>
           </div>

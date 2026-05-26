@@ -25,11 +25,7 @@ const AdminPayments = () => {
     if (!token) return;
     try {
       const res = await apiListBookings(undefined, token);
-      // Filter only paid bookings for payment management
-      const paidBookings = (res.bookings || []).filter((b: any) => 
-        b.paymentStatus === "paid" || b.paymentStatus === "partially_paid"
-      );
-      setBookings(paidBookings);
+      setBookings(res.bookings || []);
     } catch (error: any) {
       toast.error("Failed to load payments");
     } finally {
@@ -39,6 +35,14 @@ const AdminPayments = () => {
 
   useEffect(() => {
     loadPayments();
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    const interval = setInterval(() => {
+      loadPayments();
+    }, 5000);
+    return () => clearInterval(interval);
   }, [token]);
 
   const handleRefund = async (booking: any) => {
@@ -71,12 +75,11 @@ const AdminPayments = () => {
     }
   };
 
+  const getPaidAmount = (b: any) => (b.paymentStatus === "partially_paid" && b.isAdvancePaid) ? (b.advanceAmount || 0) : (b.price || 0);
+
   const totalRevenue = bookings
     .filter(b => b.paymentStatus === "paid" || b.paymentStatus === "partially_paid")
-    .reduce((sum, b) => {
-      const paidAmt = (b.paymentStatus === "partially_paid" && b.isAdvancePaid) ? (b.advanceAmount || 0) : (b.price || 0);
-      return sum + paidAmt;
-    }, 0);
+    .reduce((sum, b) => sum + getPaidAmount(b), 0);
 
   const totalRefunded = bookings
     .filter(b => b.paymentStatus === "refunded")

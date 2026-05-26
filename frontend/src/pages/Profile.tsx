@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { API_URL } from "@/lib/config";
+import { sanitizeNameInput, validateName, NAME_MAX_LENGTH, NAME_HINT } from "@/lib/validation";
 
 const Profile = () => {
   const { user, token, updateUser } = useAuth() as any;
@@ -20,13 +21,21 @@ const Profile = () => {
   }, [user]);
 
   const handleSave = async () => {
-    if (!name.trim()) {
+    const sanitizedName = sanitizeNameInput(name);
+    if (!sanitizedName.trim()) {
       toast.error("Name cannot be empty");
+      return;
+    }
+
+    const validationError = validateName(sanitizedName);
+    if (validationError) {
+      toast.error(validationError);
       return;
     }
 
     setLoading(true);
     try {
+      setName(sanitizedName);
       const res = await fetch(`${API_URL}/api/auth/profile`, {
         method: "PATCH",
         headers: {
@@ -129,11 +138,13 @@ const Profile = () => {
                   <>
                     <Input
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => setName(sanitizeNameInput(e.target.value))}
                       placeholder="Enter your name"
+                      maxLength={NAME_MAX_LENGTH}
                       className="flex-1"
                       disabled={loading}
                     />
+                    <p className="mt-1 text-xs text-muted-foreground">{NAME_HINT}</p>
                     <Button
                       size="sm"
                       onClick={handleSave}

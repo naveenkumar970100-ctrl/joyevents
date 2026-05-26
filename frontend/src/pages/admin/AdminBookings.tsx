@@ -8,15 +8,40 @@ import { apiListBookings } from "@/lib/api";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 
+const BOOKING_STATUS_OPTIONS = [
+  { value: "pending", label: "Pending" },
+  { value: "pending_approval", label: "Pending Approval" },
+  { value: "approved", label: "Approved" },
+  { value: "assigned", label: "Assigned" },
+  { value: "accepted", label: "Accepted" },
+  { value: "processing", label: "Processing" },
+  { value: "awaiting_payment", label: "Awaiting Payment" },
+  { value: "awaiting_final_payment", label: "Awaiting Final Payment" },
+  { value: "confirmed", label: "Confirmed" },
+  { value: "paid", label: "Paid" },
+  { value: "completed", label: "Completed" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
 const STATUS_COLORS: Record<string, string> = {
-  pending:    "bg-yellow-500/15 text-yellow-400 border border-yellow-500/30",
-  confirmed:  "bg-blue-500/15 text-blue-400 border border-blue-500/30",
-  assigned:   "bg-purple-500/15 text-purple-400 border border-purple-500/30",
-  accepted:   "bg-cyan-500/15 text-cyan-400 border border-cyan-500/30",
+  pending: "bg-yellow-500/15 text-yellow-400 border border-yellow-500/30",
+  pending_approval: "bg-amber-500/15 text-amber-400 border border-amber-500/30",
+  approved: "bg-sky-500/15 text-sky-400 border border-sky-500/30",
+  assigned: "bg-purple-500/15 text-purple-400 border border-purple-500/30",
+  accepted: "bg-cyan-500/15 text-cyan-400 border border-cyan-500/30",
   processing: "bg-orange-500/15 text-orange-400 border border-orange-500/30",
-  completed:  "bg-green-500/15 text-green-400 border border-green-500/30",
-  cancelled:  "bg-red-500/15 text-red-400 border border-red-500/30",
+  awaiting_payment: "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30",
+  awaiting_final_payment: "bg-violet-500/15 text-violet-400 border border-violet-500/30",
+  confirmed: "bg-blue-500/15 text-blue-400 border border-blue-500/30",
+  paid: "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30",
+  completed: "bg-green-500/15 text-green-400 border border-green-500/30",
+  cancelled: "bg-red-500/15 text-red-400 border border-red-500/30",
 };
+
+const STATUS_LABELS: Record<string, string> = BOOKING_STATUS_OPTIONS.reduce((acc, status) => {
+  acc[status.value] = status.label;
+  return acc;
+}, {} as Record<string, string>);
 
 const AdminBookings = () => {
   const { token } = useAuth() as any;
@@ -83,12 +108,9 @@ const AdminBookings = () => {
                 className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
               >
                 <option value="all">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="assigned">Assigned</option>
-                <option value="accepted">Accepted</option>
-                <option value="processing">Processing</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                {BOOKING_STATUS_OPTIONS.map(status => (
+                  <option key={status.value} value={status.value}>{status.label}</option>
+                ))}
               </select>
             </div>
             <div className="flex items-center text-sm text-muted-foreground bg-secondary px-3 py-2 rounded-lg">

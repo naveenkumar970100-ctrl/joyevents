@@ -9,7 +9,24 @@ import { STATIC_IMAGES } from "@/lib/staticImages";
 import { useState } from "react";
 import { toast } from "sonner";
 import { usePlatformName, useSupportEmail } from "@/hooks/usePlatformName";
-import { sanitizeEmailInput, validateEmail, EMAIL_HINT, EMAIL_MAX_LENGTH } from "@/lib/validation";
+import {
+  sanitizeEmailInput,
+  sanitizeNameInput,
+  sanitizeSubjectInput,
+  sanitizeMessageInput,
+  validateEmail,
+  validateName,
+  validateSubject,
+  validateMessage,
+  NAME_MAX_LENGTH,
+  SUBJECT_MAX_LENGTH,
+  MESSAGE_MAX_LENGTH,
+  EMAIL_MAX_LENGTH,
+  NAME_HINT,
+  SUBJECT_HINT,
+  MESSAGE_HINT,
+  EMAIL_HINT,
+} from "@/lib/validation";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
@@ -18,10 +35,10 @@ const Contact = () => {
   const supportEmail = useSupportEmail();
 
   const CONTACT_INFO = [
-    { icon: Mail,    title: "Email Us",       value: supportEmail,           desc: "For proposals, event planning questions, and project discussions." },
-    { icon: Phone,   title: "Call Us",        value: "+1 (555) 123-4567",    desc: "Fast communication on timelines, budgets, and availability." },
-    { icon: MapPin,  title: "Visit Us",       value: "San Francisco, CA",    desc: "In-person planning sessions and creative reviews by appointment." },
-    { icon: Clock,   title: "Business Hours", value: "Mon–Fri, 9am–6pm PST", desc: "Average response time under 2 hours during business hours." },
+    { icon: Mail,    title: "Email Us",       value: supportEmail,           desc: "For proposals, event planning questions, and project discussions.", href: `mailto:${supportEmail}` },
+    { icon: Phone,   title: "Call Us",        value: "+91 98765 43210",    desc: "Fast communication on timelines, budgets, and availability across India.", href: "tel:+919876543210" },
+    { icon: MapPin,  title: "Visit Us",       value: "Mumbai, India",    desc: "In-person planning sessions and creative reviews by appointment.", href: "https://www.google.com/maps/search/Mumbai,+India" },
+    { icon: Clock,   title: "Business Hours", value: "Mon–Fri, 9am–6pm IST", desc: "Average response time under 2 hours during business hours." },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,11 +47,31 @@ const Contact = () => {
       toast.error("Please fill in all required fields");
       return;
     }
+
+    const nameErr = validateName(form.name);
+    if (nameErr) {
+      toast.error(nameErr);
+      return;
+    }
+
     const emailErr = validateEmail(form.email);
     if (emailErr) {
       toast.error(emailErr);
       return;
     }
+
+    const subjectErr = validateSubject(form.subject);
+    if (subjectErr) {
+      toast.error(subjectErr);
+      return;
+    }
+
+    const messageErr = validateMessage(form.message);
+    if (messageErr) {
+      toast.error(messageErr);
+      return;
+    }
+
     setSending(true);
     // Simulate API call
     await new Promise((r) => setTimeout(r, 800));
@@ -107,18 +144,40 @@ const Contact = () => {
             </p>
 
             <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-1">
-              {CONTACT_INFO.map((item) => (
-                <div key={item.title} className="flex items-start gap-2 sm:gap-4 rounded-xl border border-border bg-card p-3 sm:p-4">
-                  <div className="flex h-7 w-7 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <item.icon className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-primary" />
+              {CONTACT_INFO.map((item) => {
+                const cardContent = (
+                  <div className="flex items-start gap-2 sm:gap-4">
+                    <div className="flex h-7 w-7 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                      <item.icon className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-foreground text-[11px] sm:text-sm">{item.title}</div>
+                      <div className="text-[10px] sm:text-sm text-muted-foreground line-clamp-2">{item.desc}</div>
+                      <div className="mt-0.5 text-sm font-semibold text-primary truncate">{item.value}</div>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-foreground text-[11px] sm:text-sm">{item.title}</div>
-                    <div className="text-[10px] sm:text-sm text-muted-foreground line-clamp-2">{item.desc}</div>
-                    <div className="mt-0.5 font-medium text-primary text-[10px] sm:text-sm truncate">{item.value}</div>
+                );
+
+                if (item.href) {
+                  return (
+                    <a
+                      key={item.title}
+                      href={item.href}
+                      target={item.href.startsWith("http") ? "_blank" : undefined}
+                      rel={item.href.startsWith("http") ? "noreferrer noopener" : undefined}
+                      className="rounded-xl border border-border bg-card p-3 sm:p-4 transition-colors hover:border-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    >
+                      {cardContent}
+                    </a>
+                  );
+                }
+
+                return (
+                  <div key={item.title} className="rounded-xl border border-border bg-card p-3 sm:p-4">
+                    {cardContent}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Second image - placed below contact info */}
@@ -147,7 +206,15 @@ const Contact = () => {
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2">
                   <div>
                     <label className="mb-1 block text-xs font-medium text-muted-foreground">Your Name *</label>
-                    <Input placeholder="John Doe" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="bg-secondary" required />
+                    <Input
+                      placeholder="John Doe"
+                      maxLength={NAME_MAX_LENGTH}
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: sanitizeNameInput(e.target.value) })}
+                      className="bg-secondary"
+                      required
+                    />
+                    <p className="mt-1 text-xs text-muted-foreground">{NAME_HINT}</p>
                   </div>
                   <div>
                     <label className="mb-1 block text-xs font-medium text-muted-foreground">Your Email *</label>
@@ -157,11 +224,27 @@ const Contact = () => {
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-muted-foreground">Subject</label>
-                  <Input placeholder="Wedding enquiry" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className="bg-secondary" />
+                  <Input
+                    placeholder="Wedding enquiry"
+                    maxLength={SUBJECT_MAX_LENGTH}
+                    value={form.subject}
+                    onChange={(e) => setForm({ ...form, subject: sanitizeSubjectInput(e.target.value) })}
+                    className="bg-secondary"
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">{SUBJECT_HINT}</p>
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-muted-foreground">Message *</label>
-                  <Textarea placeholder="Tell us about your event..." rows={6} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="bg-secondary resize-none" required />
+                  <Textarea
+                    placeholder="Tell us about your event..."
+                    rows={6}
+                    maxLength={MESSAGE_MAX_LENGTH}
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: sanitizeMessageInput(e.target.value) })}
+                    className="bg-secondary resize-none"
+                    required
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">{MESSAGE_HINT}</p>
                 </div>
                 <Button type="submit" className="w-full bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90" disabled={sending}>
                   {sending ? (
@@ -189,7 +272,7 @@ const Contact = () => {
             Our support team is available Monday–Friday, 9am–6pm. We typically respond within 2 hours.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <a href="tel:+15551234567">
+            <a href="tel:+919876543210">
               <Button className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
                 <Phone className="h-4 w-4" /> Call Now
               </Button>

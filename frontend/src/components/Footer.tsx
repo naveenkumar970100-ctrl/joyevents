@@ -44,8 +44,8 @@ const Footer = () => {
           <h4 className="mb-2 sm:mb-3 font-display text-xs sm:text-sm font-semibold">Contact</h4>
           <div className="flex flex-col gap-1 sm:gap-2 text-[11px] sm:text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5"><Mail className="h-3 w-3 shrink-0" /> <span className="truncate">{supportEmail}</span></span>
-            <span className="flex items-center gap-1.5"><Phone className="h-3 w-3 shrink-0" /> +1 (555) 123-4567</span>
-            <span className="flex items-center gap-1.5"><MapPin className="h-3 w-3 shrink-0" /> San Francisco, CA</span>
+            <span className="flex items-center gap-1.5"><Phone className="h-3 w-3 shrink-0" /> +91 98765 43210</span>
+            <span className="flex items-center gap-1.5"><MapPin className="h-3 w-3 shrink-0" /> Mumbai, India</span>
           </div>
         </div>
       </div>

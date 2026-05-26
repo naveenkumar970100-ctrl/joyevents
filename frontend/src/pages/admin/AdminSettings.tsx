@@ -80,7 +80,7 @@ const AdminSettings = () => {
                   value={supportEmail}
                   onChange={e => setSupportEmail(sanitizeEmailInput(e.target.value))}
                   className="mt-1 bg-secondary border-border"
-                  placeholder="support@gmail.com"
+                  placeholder="joyevents@gamil.com"
                 />
                 <p className="mt-1 text-xs text-muted-foreground">{EMAIL_HINT}</p>
               </div>
@@ -135,7 +135,7 @@ const AdminSettings = () => {
             >
               {saved ? <><Check className="h-4 w-4" /> Saved</> : "Save Changes"}
             </Button>
-            <Button variant="outline" onClick={() => { setPlatformNameState("JoyEvents"); setSupportEmail("hello@joyevents.com"); }}>
+            <Button variant="outline" onClick={() => { setPlatformNameState("JoyEvents"); setSupportEmail("joyevents@gamil.com"); }}>
               Reset Defaults
             </Button>
           </div>

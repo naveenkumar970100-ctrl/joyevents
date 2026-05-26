@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, Calendar, Briefcase, CheckCircle2, Settings, Video, User, Ticket, DollarSign, Megaphone, BarChart3, Inbox, QrCode, X, Sparkles, Globe, Menu, LogOut } from "lucide-react";
+import { LayoutDashboard, Calendar, Briefcase, CheckCircle2, Settings, Video, User, Ticket, DollarSign, Megaphone, BarChart3, Inbox, QrCode, X, Sparkles, Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { clearSession } from "@/lib/session";
 
@@ -19,7 +19,6 @@ const links = [
   { to: "/merchant-dashboard/earnings",           label: "Earnings",           icon: DollarSign },
   { to: "/merchant-dashboard/marketing",          label: "Marketing Tools",    icon: Megaphone },
   { to: "/merchant-dashboard/ai-recommendations", label: "AI Reach Stats",     icon: Sparkles, highlight: true },
-  { to: "/merchant-dashboard/language",           label: "Languages",          icon: Globe },
   { to: "/merchant-dashboard/qr-codes",           label: "QR Codes",           icon: QrCode },
   { to: "/merchant-dashboard/inbox",              label: "Inbox",              icon: Inbox },
   { to: "/merchant-dashboard/ticket-validation",  label: "Ticket Validation",  icon: Ticket },

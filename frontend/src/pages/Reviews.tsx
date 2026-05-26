@@ -19,7 +19,7 @@ const Reviews = () => {
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "event" | "service">("all");
-  const [minScore, setMinScore] = useState(0);
+  const [selectedScore, setSelectedScore] = useState(0);
 
   useEffect(() => {
     apiGetPublicReviews()
@@ -30,7 +30,7 @@ const Reviews = () => {
 
   const filtered = reviews.filter(r =>
     (filter === "all" || r.type === filter) &&
-    (minScore === 0 || r.score >= minScore)
+    (selectedScore === 0 || r.score === selectedScore)
   );
 
   const avgScore = reviews.length
@@ -91,14 +91,14 @@ const Reviews = () => {
             </button>
           ))}
           <div className="ml-auto flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Min rating:</span>
+            <span className="text-sm text-muted-foreground">Rating:</span>
             <div className="flex gap-1">
               {[0, 3, 4, 5].map(s => (
-                <button key={s} onClick={() => setMinScore(s)}
+                <button key={s} onClick={() => setSelectedScore(s)}
                   className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
-                    minScore === s ? "bg-primary text-primary-foreground border-primary" : "border-border bg-card hover:border-primary/50"
+                    selectedScore === s ? "bg-primary text-primary-foreground border-primary" : "border-border bg-card hover:border-primary/50"
                   }`}>
-                  {s === 0 ? "All" : `${s}★+`}
+                  {s === 0 ? "All" : `${s}★`}
                 </button>
               ))}
             </div>

@@ -66,7 +66,7 @@ const AdminEventMonitoring = () => {
             <section className="py-2 sm:py-8 lg:py-10">
                 <div className="mb-8">
                     <h1 className="font-display text-xs sm:text-3xl font-bold truncate">
-                        Event <span className="text-gradient">Monitoring</span>
+                        Events
                     </h1>
                     <p className="text-muted-foreground text-sm mt-1">Real-time overview and management of all platform events</p>
                 </div>

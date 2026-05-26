@@ -6,7 +6,7 @@ import AdminLayout from "@/components/AdminLayout";
 import StatCard from "@/components/StatCard";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiListBookings, apiListUsers, apiListEvents, apiBookingHistory, apiGetNotifications } from "@/lib/api";
+import { apiListBookings, apiListUsers, apiListEvents, apiGetNotifications } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import EventCard from "@/components/EventCard";
@@ -35,17 +35,16 @@ const AdminOverview = () => {
   const loadData = async () => {
     if (!token) return;
     try {
-      const [bookingRes, usersRes, eventsRes, historyRes, notificationsRes] = await Promise.all([
+      const [bookingRes, usersRes, eventsRes, notificationsRes] = await Promise.all([
         apiListBookings(undefined, token),
         apiListUsers(token),
         apiListEvents(token),
-        apiBookingHistory(token),
         apiGetNotifications(token, { limit: 10 })
       ]);
-      // Show all bookings (admin can only view status now)
+      // Show all bookings using the main bookings endpoint so totals stay aligned with payment statistics.
       const allBookingsList = bookingRes.bookings || [];
       setBookings(allBookingsList);
-      setAllBookings(historyRes.bookings || []);
+      setAllBookings(allBookingsList);
       const users: any[] = usersRes.users || [];
       setAllUsers(users);
       setMerchants(
@@ -85,16 +84,12 @@ const AdminOverview = () => {
   // Derived stats
   const totalUsers = allUsers.filter((u) => u.role === "user").length;
   const totalMerchants = merchants.length;
+  const getPaidAmount = (b: any) => (b.paymentStatus === "partially_paid" && b.isAdvancePaid) ? (b.advanceAmount || 0) : (b.price || 0);
+  const isPaidBooking = (b: any) => b.paymentStatus === "paid" || b.paymentStatus === "partially_paid";
+
   const totalRevenue = allBookings
-    .filter((b) => 
-      b.status === "completed" || 
-      (b.paymentStatus === "paid" && ["paid", "confirmed", "accepted", "processing"].includes(b.status)) ||
-      (b.paymentStatus === "partially_paid" && ["paid", "confirmed", "accepted", "processing"].includes(b.status))
-    )
-    .reduce((s: number, b: any) => {
-      const paidAmt = (b.paymentStatus === "partially_paid" && b.isAdvancePaid) ? (b.advanceAmount || 0) : (b.price || 0);
-      return s + paidAmt;
-    }, 0);
+    .filter(isPaidBooking)
+    .reduce((s: number, b: any) => s + getPaidAmount(b), 0);
 
   const filteredHistory = historyTab === "all"
     ? allBookings
@@ -218,10 +213,13 @@ const AdminOverview = () => {
                       <td className="px-4 py-3">
                         {b.rating?.score ? (
                           <div className="flex items-center gap-2">
-                            <div className="flex gap-0.5">
+                            <div className="flex gap-0.5 text-sm leading-none">
                               {[1, 2, 3, 4, 5].map((star) => (
-                                <span key={star} className={star <= b.rating.score ? "text-yellow-500" : "text-muted-foreground"}>
-                                  ⭐
+                                <span
+                                  key={star}
+                                  className={star <= Number(b.rating.score) ? "text-yellow-500 font-bold" : "text-muted-foreground"}
+                                >
+                                  {star <= Number(b.rating.score) ? "★" : "☆"}
                                 </span>
                               ))}
                             </div>

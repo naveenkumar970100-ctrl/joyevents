@@ -12,8 +12,11 @@ import { dashboardPaths, roleLabels } from "@/lib/auth";
 import { apiLogin, apiRegister } from "@/lib/api";
 import {
   sanitizeEmailInput,
+  sanitizeNameInput,
   validateLoginForm,
   validateSignupForm,
+  NAME_MAX_LENGTH,
+  NAME_HINT,
   EMAIL_HINT,
   PASSWORD_HINT,
   EMAIL_MAX_LENGTH,
@@ -91,8 +94,15 @@ const Auth = () => {
                 <Label className="text-sm text-muted-foreground">Full Name</Label>
                 <div className="relative mt-1">
                   <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input placeholder="John Doe" className="border-border bg-secondary pl-10" value={name} onChange={(e) => setName(e.target.value)} />
+                  <Input
+                    placeholder="John Doe"
+                    maxLength={NAME_MAX_LENGTH}
+                    className="border-border bg-secondary pl-10"
+                    value={name}
+                    onChange={(e) => setName(sanitizeNameInput(e.target.value))}
+                  />
                 </div>
+                <p className="mt-1 text-xs text-muted-foreground">{NAME_HINT}</p>
               </div>
             )}
             <div>

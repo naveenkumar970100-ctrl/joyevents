@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, Award, TrendingUp, Heart, Layers } from "lucide-react";
+import { ArrowRight, Award, TrendingUp, Layers } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { STATIC_IMAGES } from "@/lib/staticImages";
@@ -52,7 +52,6 @@ const PROJECTS = [
 
 const METRICS = [
   { icon: Award,      value: "1,800+", label: "Events Completed" },
-  { icon: Heart,      value: "98%",    label: "Client Satisfaction" },
   { icon: TrendingUp, value: "50K+",   label: "Guests Served" },
   { icon: Layers,     value: "12+",    label: "Event Categories" },
 ];
@@ -194,8 +193,6 @@ const Portfolio = () => (
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/40 to-transparent" />
             </div>
             <div className="absolute -bottom-5 -left-5 rounded-2xl border border-border bg-card p-4 shadow-xl">
-              <div className="font-display text-xl sm:text-3xl font-bold text-primary">98%</div>
-              <div className="text-xs text-muted-foreground">Client satisfaction</div>
             </div>
           </motion.div>
         </div>
